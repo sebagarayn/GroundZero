@@ -26,7 +26,7 @@ public abstract class Entidad extends ObjetoJuego implements Colisionable, Movib
 	@Override
 	public void actualizar(float delta) { //Delta: Tiempo en segundos desde utlimo frame
 		mover(delta);
-		sprite.setPosition(x, y);
+		sprite.setPosition(getX(), getY());
 	}
 	
 	@Override
@@ -38,8 +38,7 @@ public abstract class Entidad extends ObjetoJuego implements Colisionable, Movib
 	
 	@Override
 	public void mover(float delta) {
-		x += velocidadX;
-		y += velocidadY;
+		setPosicion(getX() + velocidadX, getY() + velocidadY);
 	}
 	
 	@Override

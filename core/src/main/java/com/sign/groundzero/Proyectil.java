@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Rectangle;
 
 /*CLASE ABSTRACTA: Para todos los proyectiles del juego, extiende ObjetoJuego e implementa
  *Colisionable y Movible*/
@@ -26,7 +25,7 @@ public abstract class Proyectil extends ObjetoJuego implements Colisionable, Mov
 	@Override
 	public void actualizar(float delta) {
 		mover(delta);
-		sprite.setPosition(x, y);
+		sprite.setPosition(getX(), getY());
 		
 		//Para destruir si sale de la pantalla
 		if(fueraDePantalla()) {
@@ -42,8 +41,7 @@ public abstract class Proyectil extends ObjetoJuego implements Colisionable, Mov
 	//Implementación de Movible
 	@Override
 	public void mover(float delta) {
-		x += velocidadX;
-		y += velocidadY;
+		setPosicion(getX() + velocidadX, getY() + velocidadY);
 	}
 	
 	@Override
@@ -75,7 +73,7 @@ public abstract class Proyectil extends ObjetoJuego implements Colisionable, Mov
 	
 	//Metodos Auxiliares
 	private boolean fueraDePantalla() {
-		return x < 0 || x > Gdx.graphics.getWidth() || y < 0 || y > Gdx.graphics.getHeight();
+		return getX() < 0 || getX() > Gdx.graphics.getWidth() || getY() < 0 || getY() > Gdx.graphics.getHeight();
 	}
 	
 	protected Sprite getSprite() { //Se necesita que la sublase acceda

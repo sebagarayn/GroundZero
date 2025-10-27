@@ -5,25 +5,24 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
+import java.util.List;
 
 /*CLASE CONCRETA: Representa al jugador, extiende entidad e implementa
  *comportamiento especifico del jugador*/
 
 public class Superviviente extends Entidad {
 	private Sound sonidoHerido;
-	private Sound sonidoDisparo;
-	private Texture texturaProyectil;
 	private boolean herido = false;
 	private int tiempoHeridoMax = 50;
 	private int tiempoHerido;
 	private int vidas = 3;
+	private Arma armaEquipada;
 	
 	public Superviviente(float x, float y, Texture textura, Sound sonidoHerido, Texture texturaProyectil, Sound sonidoDisparo) {
 		super(x, y, 90, 90, textura, 100);
 		this.sonidoHerido = sonidoHerido;
-		this.sonidoDisparo = sonidoDisparo;
-		this.texturaProyectil = texturaProyectil;
 		this.vidas = 3;
+		this.armaEquipada = new Pistola(texturaProyectil);
 	}
 	
 	@Override
@@ -35,17 +34,18 @@ public class Superviviente extends Entidad {
 		else {
 			manejarEstadoHerido();
 		}
+		armaEquipada.actualizar(delta);
 		super.actualizar(delta);
 	}
 	
 	@Override
 	public void dibujar(SpriteBatch batch) {
 		if(herido) {
-			getSprite().setX(getSprite().getX() + MathUtils.random(-2, 2));
+			getSprite().setX(getX() + MathUtils.random(-2, 2));
 		}
 		super.dibujar(batch);
 		if(herido) {
-			getSprite().setX(x);
+			getSprite().setX(getX());
 		}
 	}
 	
@@ -64,12 +64,17 @@ public class Superviviente extends Entidad {
 	
 	private void mantenerEnPantalla() {
 	    // Evitar que salga de la pantalla (sin rebotar)
-	    if (x < 0) x = 0;
-	    if (x + ancho > Gdx.graphics.getWidth()) x = Gdx.graphics.getWidth() - ancho;
-	    if (y < 0) y = 0;
-	    if (y + alto > Gdx.graphics.getHeight()) y = Gdx.graphics.getHeight() - alto;
+		float currentX = getX();
+		float currentY = getY();
+		float currentAncho = getAncho();
+		float currentAlto = getAlto();
+		
+		if (currentX < 0) currentX = 0;
+		if (currentX + currentAncho > Gdx.graphics.getWidth()) currentX = Gdx.graphics.getWidth() - currentAncho;
+		if (currentY < 0) currentY = 0;
+		if (currentY + currentAlto > Gdx.graphics.getHeight()) currentY = Gdx.graphics.getHeight() - currentAlto;
 	    
-	    setPosicion(x, y);
+		setPosicion(currentX, currentY);
 	}
 	
 	private void manejarEstadoHerido() {
@@ -80,40 +85,51 @@ public class Superviviente extends Entidad {
 	}
 	
 	@Override
+	public void recibirDanio(int danio) {
+		if (herido || estaMuerto()) return; //No recibir danio si esta herido o muerto.
+		vidas -= danio;
+		herido = true;
+		tiempoHerido = tiempoHeridoMax;
+		sonidoHerido.play();
+		
+		if (estaMuerto()) {
+			destruir();
+		}
+	}
+	
+	@Override
+	public int getSalud() {
+		return vidas;
+	}
+	
+	@Override
+	public boolean estaMuerto() {
+		return vidas <= 0;
+	}
+	
+	@Override
 	public void alColisionar(Colisionable otro) {
-		if (herido) return;
 		if (otro instanceof Enemigo) {
-			Enemigo enemigo = (Enemigo) otro;
+			recibirDanio(1);
+			Enemigo enemigo = (Enemigo) otro; //Para empuje, ver si sirve
 			setVelocidad(0, 0);
 			enemigo.setVelocidad(-enemigo.getVelocidadX(), -enemigo.getVelocidadY());
-			
-			//Recibir danio
-			recibirDanio(1);
-			vidas--;
-			herido = true;
-			tiempoHerido = tiempoHeridoMax;
-			sonidoHerido.play();
 		}
 	}
 	
-	public BalaPistola disparar() {
-		if (sonidoDisparo != null) {
-			sonidoDisparo.play();
-		}
-		return new BalaPistola(x + ancho / 2 - 5, y + alto - 5, 0, 5, texturaProyectil); 
+	public void intentarDisparar(List<Proyectil> balasDelMundo) {
+		armaEquipada.disparar(this, balasDelMundo);
 	}
 	
-	public boolean puedeDisparar() {
-		return Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.SPACE);
+	//Para cambiar el arma equipada
+	
+	public void equiparArma(Arma nuevaArma) {
+		this.armaEquipada = nuevaArma;
 	}
 	
 	@Override
 	public boolean puedeColisionarCon(Colisionable otro) {
-        return !herido && !estaDestruido() && otro instanceof Enemigo;
-    }
-	
-	public boolean estaDestruido() {
-        return !herido && estaMuerto();
+		return !herido && !estaMuerto() && otro instanceof Enemigo;
     }
 	
 	public int getVidas() {

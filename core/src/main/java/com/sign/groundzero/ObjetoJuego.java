@@ -9,9 +9,9 @@ import com.badlogic.gdx.math.Rectangle;
 //============================   CLASE OBJETOJUEGO   ========================
 
 public abstract class ObjetoJuego {
-	protected float x, y;
-	protected float ancho, alto;
-	protected boolean destruido = false;
+	private float x, y;
+	private float ancho, alto;
+	private boolean destruido = false;
 	
 	//CONSTRUCTOR
 	public ObjetoJuego(float x, float y, float ancho, float alto) {

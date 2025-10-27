@@ -9,26 +9,24 @@ import com.badlogic.gdx.graphics.Texture;
  */
 public class Zombie extends Enemigo {
     
-    public Zombie(float x, float y, int ancho, int alto, float velocidadX, float velocidadY, 
-                  Texture textura) {
+    public Zombie(float x, float y, int ancho, int alto, float velocidadX, float velocidadY, Texture textura) {
         super(x, y, ancho, alto, textura, 10, 10); //Primer 10 es la vida
         
-        // Validar que no quede fuera de pantalla
-        if (x - ancho < 0) {
-            this.x = x + ancho;
-        }
-        if (x + ancho > Gdx.graphics.getWidth()) {
-            this.x = x - ancho;
-        }
-        if (y - alto < 0) {
-            this.y = y + alto;
-        }
-        if (y + alto > Gdx.graphics.getHeight()) {
-            this.y = y - alto;
-        }
-        
+        validarPosicionInicial(ancho, alto);
+        getSprite().setPosition(getX(), getY());
         setVelocidad(velocidadX, velocidadY);
-        getSprite().setPosition(this.x, this.y);
+    }
+    
+    private void validarPosicionInicial(int ancho, int alto) {
+    	float newX = getX();
+        float newY = getY();
+        
+        if (newX < 0) newX = 0;
+        if (newX + ancho > Gdx.graphics.getWidth()) newX = Gdx.graphics.getWidth() - ancho;
+        if (newY < 0) newY = 0;
+        if (newY + alto > Gdx.graphics.getHeight()) newY = Gdx.graphics.getHeight() - alto;
+        
+        setPosicion(newX, newY);
     }
     
     @Override
@@ -39,14 +37,18 @@ public class Zombie extends Enemigo {
     
     @Override
     public void comportamientoMovimiento(float delta) {
-        // Rebotar en los bordes de la pantalla
         float vx = getVelocidadX();
         float vy = getVelocidadY();
         
-        if (x + vx < 0 || x + vx + ancho > Gdx.graphics.getWidth()) {
+        float currentX = getX();
+        float currentY = getY();
+        float currentAncho = getAncho();
+        float currentAlto = getAlto();
+
+        if ((currentX <= 0 && vx < 0) || (currentX + currentAncho >= Gdx.graphics.getWidth() && vx > 0)) {
             vx *= -1;
         }
-        if (y + vy < 0 || y + vy + alto > Gdx.graphics.getHeight()) {
+        if ((currentY <= 0 && vy < 0) || (currentY + currentAlto >= Gdx.graphics.getHeight() && vy > 0)) {
             vy *= -1;
         }
         
@@ -55,32 +57,20 @@ public class Zombie extends Enemigo {
     
     @Override
     public void alColisionar(Colisionable otro) {
-        if (otro instanceof Zombie) {
-            Zombie otroZombie = (Zombie) otro;
-            
-            // Física de rebote entre zombies
-            float vx = getVelocidadX();
-            float vy = getVelocidadY();
-            float otroVx = otroZombie.getVelocidadX();
-            float otroVy = otroZombie.getVelocidadY();
-            
-            if (vx == 0) vx += otroVx / 2;
-            if (otroVx == 0) otroVx += vx / 2;
-            
-            if (vy == 0) vy += otroVy / 2;
-            if (otroVy == 0) otroVy += vy / 2;
-            
-            setVelocidad(-vx, -vy);
-            otroZombie.setVelocidad(-otroVx, -otroVy);
+        if (otro instanceof Enemigo) {
+            manejarReboteConEnemigo((Movible) otro);
         }
-        else if (otro instanceof BalaPistola) {
-            BalaPistola bala = (BalaPistola) otro;
-            recibirDanio(bala.getDanio());
-        }
+    }
+    
+    private void manejarReboteConEnemigo(Movible otroMovible) {
+        float vx = getVelocidadX();
+        float vy = getVelocidadY();
+        
+        setVelocidad(-vx, -vy);
     }
     
     @Override
     public boolean puedeColisionarCon(Colisionable otro) {
-        return !estaDestruido() && (otro instanceof Zombie || otro instanceof Superviviente);
+    	return !estaDestruido() && (otro instanceof Enemigo || otro instanceof Daniable);
     }
 }

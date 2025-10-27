@@ -1,8 +1,6 @@
 package com.sign.groundzero;
-
 import java.util.ArrayList;
 import java.util.Random;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
@@ -11,11 +9,13 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.Input;
 
 /**
  * Pantalla principal del juego
  * Maneja la lógica del juego, renderizado y colisiones
  */
+
 public class PantallaJuego implements Screen {
 
 	private GroundZero game;
@@ -30,8 +30,8 @@ public class PantallaJuego implements Screen {
 	private int cantZombies;
 	
 	private Superviviente jugador;
-	private ArrayList<Zombie> zombies = new ArrayList<>();
-	private ArrayList<BalaPistola> balas = new ArrayList<>();
+	private ArrayList<Enemigo> zombies = new ArrayList<>();
+	private ArrayList<Proyectil> balas = new ArrayList<>();
 
 	public PantallaJuego(GroundZero game, int ronda, int vidas, int score,  
 			int velXZombies, int velYZombies, int cantZombies) {
@@ -47,6 +47,7 @@ public class PantallaJuego implements Screen {
 		camera.setToOrtho(false, 800, 640);
 		
 		//inicializar assets; musica de fondo y efectos de sonido
+		
 		explosionSound = Gdx.audio.newSound(Gdx.files.internal("explosion.ogg"));
 		explosionSound.setVolume(1, 0.5f);
 		gameMusic = Gdx.audio.newMusic(Gdx.files.internal("piano-loops.wav"));
@@ -79,16 +80,25 @@ public class PantallaJuego implements Screen {
 	    int altoZombie = (int)(anchoZombie * aspectRatio);  //
 	    
 	    for (int i = 0; i < cantZombies; i++) {
-	        Zombie zombie = new Zombie(
-	            r.nextInt((int)Gdx.graphics.getWidth()),
-	            50 + r.nextInt((int)Gdx.graphics.getHeight()-50),
-	            anchoZombie,  
-	            altoZombie,  
-	            velXZombies + r.nextInt(4), 
-	            velYZombies + r.nextInt(4), 
-	            new Texture(Gdx.files.internal("Enemigos/zombie.png"))
-	        );	   
-	        zombies.add(zombie);
+	        float posX = r.nextInt((int)Gdx.graphics.getWidth());
+	        float posY = 50 + r.nextInt((int)Gdx.graphics.getHeight()-50);
+	        
+	        if (r.nextInt(5) == 0) { // 20% de probabilidad de ser un Acechador
+	            Acechador acechador = new Acechador(
+	                posX, posY, anchoZombie, altoZombie, 
+	                velXZombies + r.nextInt(4), // O una velocidad base
+	                new Texture(Gdx.files.internal("Enemigos/acechador.png"))
+	            );
+	            zombies.add(acechador); // Añadir a la List<Enemigo>
+	        } else { // 80% de ser un Zombie normal
+	            Zombie zombie = new Zombie(
+	                posX, posY, anchoZombie, altoZombie, 
+	                velXZombies + r.nextInt(4), 
+	                velYZombies + r.nextInt(4), 
+	                new Texture(Gdx.files.internal("Enemigos/zombie.png"))
+	            );	   
+	            zombies.add(zombie); // Añadir a la List<Enemigo>
+	        }
 	    }
 	}
 	
@@ -119,83 +129,78 @@ public class PantallaJuego implements Screen {
 	
 	private void actualizarJuego(float delta) {
 		if (!jugador.estaHerido()) {
-			// Actualizar jugador
-			jugador.actualizar(delta);
 			
-			// Disparar si presiona espacio
-			if (jugador.puedeDisparar()) {
-				balas.add(jugador.disparar());
-			}
+			jugador.actualizar(delta); //Actualizar jugador (esto también actualiza el cooldown del arma)
 			
-			// Actualizar balas
-			actualizarBalas(delta);
-			
-			// Actualizar zombies
-			actualizarZombies(delta);
-			
-			// Detectar colisiones
-			detectarColisiones();
+            if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) { //Logica de disparo
+                jugador.intentarDisparar(balas); // Le pasa la lista abstracta <Proyectil>
+            }
+		
+			actualizarBalas(delta); //Actualizar balas
+			actualizarZombies(delta); //Actualizar Zombies
+			detectarColisiones(); //Detectar colisiones
 		} else {
 			jugador.actualizar(delta);
 		}
 	}
 	
 	private void actualizarBalas(float delta) {
-		for (int i = 0; i < balas.size(); i++) {
-			BalaPistola bala = balas.get(i);
-			bala.actualizar(delta);
-			
+		for (int i = balas.size() - 1; i >= 0; i--) { //Para eliminar balas.
+			Proyectil bala = balas.get(i);
+			bala.actualizar(delta);		
 			if (bala.estaDestruido()) {
 				balas.remove(i);
-				i--;
 			}
 		}
 	}
 	
 	private void actualizarZombies(float delta) {
-		for (int i = 0; i < zombies.size(); i++) {
-			Zombie zombie = zombies.get(i);
+		for (int i = zombies.size() - 1; i >= 0; i--) { //Para eliminar zombies.
+			Enemigo zombie = zombies.get(i);
 			zombie.actualizar(delta);
 			
 			if (zombie.estaDestruido()) {
 				zombies.remove(i);
-				i--;
 			}
 		}
 	}
 	
 	private void detectarColisiones() {
-		// Colisiones balas vs zombies
 		for (int i = 0; i < balas.size(); i++) {
-			BalaPistola bala = balas.get(i);
+			// CORRECCIÓN: Usar la abstracción Proyectil
+			Proyectil bala = balas.get(i);
+			
+			// Bucle 'for j' para enemigos
 			for (int j = 0; j < zombies.size(); j++) {
-				Zombie zombie = zombies.get(j);
+				// CORRECCIÓN: Usar la abstracción Enemigo
+				Enemigo zombie = zombies.get(j);
 				
+				// Esta lógica funciona gracias al polimorfismo
 				if (bala.getBounds().overlaps(zombie.getBounds())) {
 					bala.alColisionar(zombie);
 					zombie.alColisionar(bala);
 					explosionSound.play();
 					score += zombie.getValorPuntos();
-					bala.destruir();
+					// bala.destruir(); // bala.alColisionar ya debería hacer esto
 
 					if (zombie.estaMuerto() || zombie.estaDestruido()) {
 						zombies.remove(j);
-						j--;
+						j--; // Compensar el índice por la eliminación
 					}
-					break;
+					
+					// Si la bala choca, también debe destruirse
+					if (bala.estaDestruido()) {
+						balas.remove(i);
+						i--; // Compensar el índice
+						break; // Salir del bucle 'j' (zombies) porque la bala ya no existe
+					}
 				}
-			}
-		}
-		
-		for(int i = balas.size() - 1 ; i >= 0 ; i --) {
-			if(balas.get(i).estaDestruido()) {
-				balas.remove(i);
 			}
 		}
 		
 		// Colisiones jugador vs zombies
 		for (int i = 0; i < zombies.size(); i++) {
-			Zombie zombie = zombies.get(i);
+			Enemigo zombie = zombies.get(i);
 			if (jugador.getBounds().overlaps(zombie.getBounds()) && 
 				jugador.puedeColisionarCon(zombie)) {
 				jugador.alColisionar(zombie);
@@ -205,19 +210,19 @@ public class PantallaJuego implements Screen {
 		
 		// Colisiones entre zombies
 		for (int i = 0; i < zombies.size(); i++) {
-			Zombie zombie1 = zombies.get(i);
+			Enemigo zombie1 = zombies.get(i);
 			for (int j = i + 1; j < zombies.size(); j++) {
-				Zombie zombie2 = zombies.get(j);
+				Enemigo zombie2 = zombies.get(j);
 				if (zombie1.getBounds().overlaps(zombie2.getBounds())) {
 					zombie1.alColisionar(zombie2);
+					zombie2.alColisionar(zombie1);
 				}
 			}
 		}
 	}
 	
 	private void dibujarEntidades() {
-		// Dibujar balas
-		for (BalaPistola bala : balas) {
+		for (Proyectil bala : balas) {
 			bala.dibujar(batch);
 		}
 		
@@ -225,7 +230,7 @@ public class PantallaJuego implements Screen {
 		jugador.dibujar(batch);
 		
 		// Dibujar zombies
-		for (Zombie zombie : zombies) {
+		for (Enemigo zombie : zombies) {
 			zombie.dibujar(batch);
 		}
 	}

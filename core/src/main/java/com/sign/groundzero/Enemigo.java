@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
  *comportamiento especifo de enemigos*/
 
 public abstract class Enemigo extends Entidad {
-	public int valorPuntos;
+	private final int valorPuntos;
 	
 	public Enemigo(float x, float y, float ancho, float alto, Texture textura, int salud, int valorPuntos) {
 		super(x, y, ancho, alto, textura, salud);
