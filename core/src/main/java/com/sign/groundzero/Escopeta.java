@@ -8,6 +8,7 @@ import java.util.List;
 public class Escopeta extends Arma {
 	private static final float cadenciaEscopeta = 0.8f; //Define la cadencia de la escopeta, esto es disparos por segundo.
 	private static final float velocidadProyectil = 7.0f; //Velocidad base de los perdigones.
+	private static final float spread = 1.0f; // Amplitud de la dispersión
 	private Texture texturaProyectil; //Textura para los perdigones, bala de escopeta.
 	
 	//Constructor, se llama al constructor de arma pasando la cadencia.
@@ -29,17 +30,36 @@ public class Escopeta extends Arma {
         float x = portador.getX();
         float y = portador.getY();
         
-        BalaEscopeta balaCentro = new BalaEscopeta( //Bala 1 creada.
-            x, y, 0, velocidadProyectil, texturaProyectil
-        );
+        Superviviente.Direccion dir = portador.getDireccionActual();
+        
+        float vx_centro = 0, vy_centro = 0;
+        float vx_spread = 0, vy_spread = 0;
+        
+        switch(dir) {
+        	case ARRIBA:
+        		vy_centro = velocidadProyectil;
+        		vx_spread = spread; // Dispersión horizontal
+        		break;
+        	case ABAJO:
+        		vy_centro = -velocidadProyectil;
+        		vx_spread = spread; // Dispersión horizontal
+        		break;
+        	case DERECHA:
+        		vx_centro = velocidadProyectil;
+        		vy_spread = spread; // Dispersión vertical
+        		break;
+        	case IZQUIERDA:
+        		vx_centro = -velocidadProyectil;
+        		vy_spread = spread; // Dispersión vertical
+        		break;
+    }
+        
+        BalaEscopeta balaCentro = new BalaEscopeta(x, y, vx_centro, vy_centro, texturaProyectil);
 
-        BalaEscopeta balaIzquierda = new BalaEscopeta( //Bala 2 creada.
-            x, y, -1.0f, velocidadProyectil * 0.95f, texturaProyectil
-        );
+        BalaEscopeta balaIzquierda = new BalaEscopeta(x, y, vx_centro - vx_spread, vy_centro - vy_spread, texturaProyectil);
 
-        BalaEscopeta balaDerecha = new BalaEscopeta( //Bala 3 creada.
-            x, y, 1.0f, velocidadProyectil * 0.95f, texturaProyectil
-        );
+        BalaEscopeta balaDerecha = new BalaEscopeta(x, y, vx_centro + vx_spread, vy_centro + vy_spread, texturaProyectil
+            );
 
         balasDelMundo.add(balaCentro); //Se agregan las balas a la lista del mundo.
         balasDelMundo.add(balaIzquierda);

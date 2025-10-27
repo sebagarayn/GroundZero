@@ -17,7 +17,8 @@ import com.badlogic.gdx.Input;
  */
 
 public class PantallaJuego implements Screen {
-
+	private static final float worldWidth = 1600f;
+	private static final float worldHeight = 900f;
 	private GroundZero game;
 	private OrthographicCamera camera;	
 	private SpriteBatch batch;
@@ -28,13 +29,14 @@ public class PantallaJuego implements Screen {
 	private int velXZombies; 
 	private int velYZombies; 
 	private int cantZombies;
+	private boolean escopetaDesbloqueada = false; //Si tiene o no la escopeta el jugador
+	private Texture texturaEscopeta;
 	
 	private Superviviente jugador;
 	private ArrayList<Enemigo> zombies = new ArrayList<>();
 	private ArrayList<Proyectil> balas = new ArrayList<>();
 
-	public PantallaJuego(GroundZero game, int ronda, int vidas, int score,  
-			int velXZombies, int velYZombies, int cantZombies) {
+	public PantallaJuego(GroundZero game, int ronda, int vidas, int score, int velXZombies, int velYZombies, int cantZombies) {
 		this.game = game;
 		this.ronda = ronda;
 		this.score = score;
@@ -44,7 +46,7 @@ public class PantallaJuego implements Screen {
 		
 		batch = game.getBatch();
 		camera = new OrthographicCamera();	
-		camera.setToOrtho(false, 800, 640);
+		camera.setToOrtho(false, worldWidth, worldHeight);
 		
 		//inicializar assets; musica de fondo y efectos de sonido
 		
@@ -55,6 +57,8 @@ public class PantallaJuego implements Screen {
 		gameMusic.setLooping(true);
 		gameMusic.setVolume(0.5f);
 		gameMusic.play();
+		
+		texturaEscopeta = new Texture(Gdx.files.internal("Rocket2.png"));
 		
 	    // Crear jugador
 	    jugador = new Superviviente(
@@ -236,6 +240,13 @@ public class PantallaJuego implements Screen {
 	}
 	
 	private void verificarEstadoJuego() {
+		final int scoreEscopeta = 100;
+		
+		if (!escopetaDesbloqueada && score >= scoreEscopeta) {
+			escopetaDesbloqueada = true;
+			Escopeta nuevaArma = new Escopeta(texturaEscopeta);
+			jugador.equiparArma(nuevaArma);
+		}
 		// Game Over
 		if (jugador.estaDestruido()) {
 			if (score > game.getHighScore()) {
@@ -249,9 +260,8 @@ public class PantallaJuego implements Screen {
 		
 		// Nivel completado
 		if (zombies.size() == 0) {
-			Screen ss = new PantallaJuego(game, ronda+1, jugador.getVidas(), score, 
-					velXZombies+3, velYZombies+3, cantZombies+10);
-			ss.resize(1200, 800);
+			Screen ss = new PantallaJuego(game, ronda+1, jugador.getVidas(), score, velXZombies+3, velYZombies+3, cantZombies+10);
+			ss.resize(1600, 900);
 			game.setScreen(ss);
 			dispose();
 		}
@@ -287,4 +297,12 @@ public class PantallaJuego implements Screen {
 		explosionSound.dispose();
 		gameMusic.dispose();
 	}
+	
+	public static float getWorldWidth() {
+        return worldWidth;
+    }
+	
+    public static float getWorldHeight() {
+        return worldHeight;
+    }
 }

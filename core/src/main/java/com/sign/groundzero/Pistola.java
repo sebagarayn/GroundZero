@@ -28,9 +28,27 @@ public class Pistola extends Arma {
 
         float x = portador.getX();
         float y = portador.getY();
+        Superviviente.Direccion dir = portador.getDireccionActual();
         
-        BalaPistola bala = new BalaPistola(x, y, 0, velocidadProyectil, texturaProyectil); //Creacion de la bala.
-
+        float vx = 0;
+        float vy = 0;
+        
+        switch(dir) {
+        	case ARRIBA:
+        		vy = velocidadProyectil;
+        		break;
+        	case ABAJO:
+        		vy = -velocidadProyectil;
+        		break;
+        	case DERECHA:
+        		vx = velocidadProyectil;
+        		break;
+        	case IZQUIERDA:
+        		vx = -velocidadProyectil;
+        		break;
+        }
+        
+        BalaPistola bala = new BalaPistola(x, y, vx, vy, texturaProyectil);; //Creacion de la bala.
         balasDelMundo.add(bala); //Se agrega bala a la lista del mundo.
         
         reiniciarCooldown(); //Se reinicia el cooldown con el metodo heredado por protected.

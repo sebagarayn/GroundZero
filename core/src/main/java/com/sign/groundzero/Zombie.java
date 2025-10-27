@@ -44,14 +44,17 @@ public class Zombie extends Enemigo {
         float currentY = getY();
         float currentAncho = getAncho();
         float currentAlto = getAlto();
+        
+        float screenWidth = PantallaJuego.getWorldWidth();
+        float screenHeight = PantallaJuego.getWorldHeight();
 
-        if ((currentX <= 0 && vx < 0) || (currentX + currentAncho >= Gdx.graphics.getWidth() && vx > 0)) {
+		if ((currentX <= 0 && vx < 0) || (currentX + currentAncho >= screenWidth && vx > 0)) {
             vx *= -1;
         }
-        if ((currentY <= 0 && vy < 0) || (currentY + currentAlto >= Gdx.graphics.getHeight() && vy > 0)) {
+        if ((currentY <= 0 && vy < 0) || (currentY + currentAlto >= screenHeight && vy > 0)) {
             vy *= -1;
         }
-        
+
         setVelocidad(vx, vy);
     }
     

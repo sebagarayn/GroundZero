@@ -5,6 +5,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
+
 import java.util.List;
 
 /*CLASE CONCRETA: Representa al jugador, extiende entidad e implementa
@@ -17,12 +18,18 @@ public class Superviviente extends Entidad {
 	private int tiempoHerido;
 	private int vidas = 3;
 	private Arma armaEquipada;
+	private Direccion direccionActual = Direccion.ARRIBA;
+	
+	public enum Direccion{ //Las armas deben poder verlo por eso queda publico.
+		ARRIBA, ABAJO, IZQUIERDA, DERECHA
+	}
 	
 	public Superviviente(float x, float y, Texture textura, Sound sonidoHerido, Texture texturaProyectil, Sound sonidoDisparo) {
 		super(x, y, 90, 90, textura, 100);
 		this.sonidoHerido = sonidoHerido;
 		this.vidas = 3;
 		this.armaEquipada = new Pistola(texturaProyectil);
+		getSprite().setOriginCenter();
 	}
 	
 	@Override
@@ -54,13 +61,26 @@ public class Superviviente extends Entidad {
 		float vx = 0;
 		float vy = 0;
 		
-		if (Gdx.input.isKeyPressed(com.badlogic.gdx.Input.Keys.LEFT)) vx = -3;
-		if (Gdx.input.isKeyPressed(com.badlogic.gdx.Input.Keys.RIGHT)) vx = 3;
-		if (Gdx.input.isKeyPressed(com.badlogic.gdx.Input.Keys.DOWN)) vy = -3;
-		if (Gdx.input.isKeyPressed(com.badlogic.gdx.Input.Keys.UP)) vy = 3;
-		
-		setVelocidad(vx, vy);
-	}
+		if (Gdx.input.isKeyPressed(com.badlogic.gdx.Input.Keys.LEFT)) {
+            vx = -3;
+            direccionActual = Direccion.IZQUIERDA;
+            getSprite().setRotation(90); // Rota el sprite
+        } else if (Gdx.input.isKeyPressed(com.badlogic.gdx.Input.Keys.RIGHT)) {
+            vx = 3;
+            direccionActual = Direccion.DERECHA;
+            getSprite().setRotation(-90);
+        } else if (Gdx.input.isKeyPressed(com.badlogic.gdx.Input.Keys.DOWN)) {
+            vy = -3;
+            direccionActual = Direccion.ABAJO;
+            getSprite().setRotation(180);
+        } else if (Gdx.input.isKeyPressed(com.badlogic.gdx.Input.Keys.UP)) {
+            vy = 3;
+            direccionActual = Direccion.ARRIBA;
+            getSprite().setRotation(0);
+        }
+        
+        setVelocidad(vx, vy);
+    }
 	
 	private void mantenerEnPantalla() {
 	    // Evitar que salga de la pantalla (sin rebotar)
@@ -69,12 +89,15 @@ public class Superviviente extends Entidad {
 		float currentAncho = getAncho();
 		float currentAlto = getAlto();
 		
+		float screenWidth = PantallaJuego.getWorldWidth();
+		float screenHeight = PantallaJuego.getWorldHeight();
+		
 		if (currentX < 0) currentX = 0;
-		if (currentX + currentAncho > Gdx.graphics.getWidth()) currentX = Gdx.graphics.getWidth() - currentAncho;
-		if (currentY < 0) currentY = 0;
-		if (currentY + currentAlto > Gdx.graphics.getHeight()) currentY = Gdx.graphics.getHeight() - currentAlto;
-	    
-		setPosicion(currentX, currentY);
+	    if (currentX + currentAncho > screenWidth) currentX = screenWidth - currentAncho;
+	    if (currentY < 0) currentY = 0;
+	    if (currentY + currentAlto > screenHeight) currentY = screenHeight - currentAlto;
+
+	    setPosicion(currentX, currentY);
 	}
 	
 	private void manejarEstadoHerido() {
@@ -142,5 +165,9 @@ public class Superviviente extends Entidad {
 	
 	public boolean estaHerido() {
         return herido;
+    }
+	
+	public Direccion getDireccionActual() { //Getter para que el arma separ la direccion
+        return direccionActual;
     }
 }

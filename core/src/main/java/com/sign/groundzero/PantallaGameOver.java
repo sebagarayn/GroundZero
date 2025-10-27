@@ -6,7 +6,6 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-
 public class PantallaGameOver implements Screen {
 
 	private GroundZero game;
@@ -16,7 +15,7 @@ public class PantallaGameOver implements Screen {
 		this.game = game;
         
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false, 1200, 800);
+		camera.setToOrtho(false, PantallaJuego.getWorldWidth(), PantallaJuego.getWorldHeight());
 	}
 
 	@Override
@@ -34,7 +33,7 @@ public class PantallaGameOver implements Screen {
 
 		if (Gdx.input.isTouched() || Gdx.input.isKeyJustPressed(Input.Keys.ANY_KEY)) {
 			Screen ss = new PantallaJuego(game,1,3,0,1,1,10);
-			ss.resize(1200, 800);
+			ss.resize((int)PantallaJuego.getWorldWidth(), (int)PantallaJuego.getWorldHeight());;
 			game.setScreen(ss);
 			dispose();
 		}
