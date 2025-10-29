@@ -5,11 +5,9 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-
-
+// Clase concreta
 
 public class GroundZero extends Game {
-	private String nombreJuego = "Space Navigation";
 	private SpriteBatch batch;
 	private BitmapFont font;
 	private int highScore;	
@@ -24,7 +22,7 @@ public class GroundZero extends Game {
 	}
 
 	public void render() {
-		super.render(); // important!
+		super.render();
 	}
 
 	public void dispose() {
@@ -45,9 +43,8 @@ public class GroundZero extends Game {
 	}
 
 	public void setHighScore(int highScore) {
-		this.highScore = highScore;
+	    if (highScore >= 0) {
+	        this.highScore = highScore;
+	    }
 	}
-	
-	
-
 }

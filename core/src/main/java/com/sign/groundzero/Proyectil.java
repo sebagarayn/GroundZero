@@ -1,12 +1,14 @@
 package com.sign.groundzero;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
 
 /*CLASE ABSTRACTA: Para todos los proyectiles del juego, extiende ObjetoJuego e implementa
- *Colisionable y Movible*/
+ *Colisionable y Movible.*/
+
+// ========================= CLASE ABSTRACTA PROYECTIL ========================= 
 
 public abstract class Proyectil extends ObjetoJuego implements Colisionable, Movible {
 	private Sprite sprite;
@@ -15,6 +17,9 @@ public abstract class Proyectil extends ObjetoJuego implements Colisionable, Mov
 	
 	public Proyectil(float x, float y, float velocidadX, float velocidadY, Texture textura, float ancho, float alto) {
 		super(x, y, ancho, alto);
+        if (textura == null) {
+            throw new IllegalArgumentException("La textura no puede ser null");
+        }
 		this.velocidadX = velocidadX;
 		this.velocidadY = velocidadY;
 		this.sprite = new Sprite(textura);
@@ -22,6 +27,7 @@ public abstract class Proyectil extends ObjetoJuego implements Colisionable, Mov
 	}
 	
 	//Implementacion de ObjetoJuego
+	
 	@Override
 	public void actualizar(float delta) {
 		mover(delta);
@@ -34,6 +40,23 @@ public abstract class Proyectil extends ObjetoJuego implements Colisionable, Mov
 	}
 	
 	@Override
+	public Rectangle getBounds() {
+		float scale = ConfiguracionJuego.ESCALA_HITBOX_PROYECTIL;
+		float originalWidth = getAncho(); // Obtener ancho de ObjetoJuego
+		float originalHeight = getAlto(); // Obtener alto de ObjetoJuego
+		float originalX = getX(); // Obtener X de ObjetoJuego
+		float originalY = getY(); // Obtener Y de ObjetoJuego
+		
+		float hitboxWidth = originalWidth * scale;
+        float hitboxHeight = originalHeight * scale;
+        
+        float hitboxX = originalX + (originalWidth - hitboxWidth) / 2f;
+        float hitboxY = originalY + (originalHeight - hitboxHeight) / 2f;
+        
+        return new Rectangle(hitboxX, hitboxY, hitboxWidth, hitboxHeight);
+	}
+	
+	@Override
 	public void dibujar(SpriteBatch batch) {
 		sprite.draw(batch);
 	}
@@ -41,7 +64,7 @@ public abstract class Proyectil extends ObjetoJuego implements Colisionable, Mov
 	//Implementación de Movible
 	@Override
 	public void mover(float delta) {
-		setPosicion(getX() + velocidadX, getY() + velocidadY);
+		setPosicion(getX() + velocidadX * delta, getY() + velocidadY * delta);
 	}
 	
 	@Override
@@ -72,9 +95,9 @@ public abstract class Proyectil extends ObjetoJuego implements Colisionable, Mov
 	}
 	
 	//Metodos Auxiliares
-	private boolean fueraDePantalla() {
-		return getX() < 0 || getX() > Gdx.graphics.getWidth() || getY() < 0 || getY() > Gdx.graphics.getHeight();
-	}
+    private boolean fueraDePantalla() {
+        return getX() < 0 || getX() > Gdx.graphics.getWidth() || getY() < 0 || getY() > Gdx.graphics.getHeight();
+    }
 	
 	protected Sprite getSprite() { //Se necesita que la sublase acceda
 		return sprite;

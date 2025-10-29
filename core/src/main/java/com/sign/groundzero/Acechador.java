@@ -1,47 +1,37 @@
 package com.sign.groundzero;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 
-//Clase Concreta: Representa un enemigo de tipo acechador.
-//Extiende Enemigo.
+/* Clase Concreta: Representa un enemigo de tipo acechador.
+ * Extiende Enemigo. */
+
+//====================   CLASE CONCRETA ACECHADOR   =====================
 
 public class Acechador extends Enemigo {
 	private final float velocidadBase;
+	private LimitesJuego limites;
 	
-	//Constructor
+	//Constructor Acechador
 
-	public Acechador(float x, float y, int ancho, int alto, float velocidad, Texture textura) {
+	public Acechador(float x, float y, float ancho, float alto, float velocidad, Texture textura, LimitesJuego limites) {
+		
 		super(x, y, ancho, alto, textura, 20, 25);
+		if (limites == null) {
+            throw new IllegalArgumentException("Los límites no pueden ser null");
+        }
+        if (velocidad <= 0) {
+            throw new IllegalArgumentException("La velocidad debe ser positiva: " + velocidad);
+        }
 		this.velocidadBase = velocidad;
-		validarPosicionInicial(ancho, alto); //Validar posicion inicial dentro de pantalla.
+		this.limites = limites;
+		validarPosicionInicial(limites); //Validar posicion inicial dentro de pantalla.
 		getSprite().setPosition(getX(), getY());
-	}
-	
-	//Para validar que la posicion inicial este dentro de los limites.
-	
-	private void validarPosicionInicial(int ancho, int alto) {
-		float newX = getX();
-		float newY = getY();
-
-		if(newX < 0) {
-			newX = 0;
-		}
-        if (newX + ancho > Gdx.graphics.getWidth()) {
-            newX = Gdx.graphics.getWidth() - ancho;
-        }
-        if (newY < 0) {
-            newY = 0;
-        }
-        if (newY + alto > Gdx.graphics.getHeight()) {
-            newY = Gdx.graphics.getHeight() - alto;
-        }
-        setPosicion(newX, newY);
 	}
 	
 	//Actualizar el estado del acechador
 	
     @Override
     public void actualizar(float delta) {
+    	
         comportamientoMovimiento(delta);
         super.actualizar(delta);
     }
@@ -50,6 +40,7 @@ public class Acechador extends Enemigo {
     
     @Override
     public void comportamientoMovimiento(float delta) {
+    	
         float vx = getVelocidadX();
         float vy = getVelocidadY();
         
@@ -59,14 +50,14 @@ public class Acechador extends Enemigo {
         }
 
         float currentX = getX();
-        float currentY = getY();
+        float currentY = getY();     
         float currentAncho = getAncho();
         float currentAlto = getAlto();
         
-        float screenWidth = PantallaJuego.getWorldWidth();
-        float screenHeight = PantallaJuego.getWorldHeight();
+        float screenWidth = limites.getWorldWidth();
+        float screenHeight = limites.getWorldHeight();
 
-		if ((currentX <= 0 && vx < 0) || (currentX + currentAncho >= screenWidth && vx > 0)) {
+        if ((currentX <= 0 && vx < 0) || (currentX + currentAncho >= screenWidth && vx > 0)) {
             vx *= -1;
         }
         if ((currentY <= 0 && vy < 0) || (currentY + currentAlto >= screenHeight && vy > 0)) {
@@ -80,6 +71,7 @@ public class Acechador extends Enemigo {
     
     @Override
     public void alColisionar(Colisionable otro) {
+    	
         if (otro instanceof Movible && otro instanceof Enemigo) { // Rebote con otros enemigos (Movible), que es una regla especifica del juego en si.
             manejarReboteConEnemigo((Movible) otro);
         }
@@ -88,9 +80,9 @@ public class Acechador extends Enemigo {
     //Para manejar el rebote con otro enemigo usando interfaces
     
     private void manejarReboteConEnemigo(Movible otroMovible) {
+    	
         float vx = getVelocidadX();
-        float vy = getVelocidadY();
-        
+        float vy = getVelocidadY();        
         setVelocidad(-vx, -vy);
     }
     
@@ -98,6 +90,7 @@ public class Acechador extends Enemigo {
     
     @Override
     public boolean puedeColisionarCon(Colisionable otro) {
+    	
         return !estaDestruido() && (otro instanceof Enemigo || otro instanceof Daniable); // Puede colisionar con otros enemigos o con entidades dañables, que es una regla del juego.
     }
 }

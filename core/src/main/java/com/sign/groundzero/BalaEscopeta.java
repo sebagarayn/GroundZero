@@ -2,7 +2,7 @@ package com.sign.groundzero;
 import com.badlogic.gdx.graphics.Texture;
 
 //Clase Concreta: Representa un proyectil de escopeta.
-//Extiende Proyectil e implementa comportamiento especifico.
+//Extiende Proyectil e implementa comportamiento especifico..
 
 public class BalaEscopeta extends Proyectil {
 	private final int danio;
@@ -11,7 +11,7 @@ public class BalaEscopeta extends Proyectil {
 	
 	public BalaEscopeta(float x, float y, float velocidadX, float velocidadY, Texture textura) {
 		super(x, y, velocidadX, velocidadY, textura, 15, 15);
-		this.danio = 25;
+		this.danio = ConfiguracionJuego.DANIO_ESCOPETA; 
 	}
 	
 	//Constructor para poner danio personalizado.

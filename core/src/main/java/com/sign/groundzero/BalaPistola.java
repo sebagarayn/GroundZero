@@ -2,7 +2,7 @@ package com.sign.groundzero;
 import com.badlogic.gdx.graphics.Texture;
 
 //Clase Concreta: Representa un proyectil de pistola.
-//Extiende Proyectil e implementa comportamiento específico.
+//Extiende Proyectil e implementa comportamiento específico..
 
 public class BalaPistola extends Proyectil {
     private final int danio;
@@ -10,14 +10,14 @@ public class BalaPistola extends Proyectil {
     //Constructor con valores por defecto
     
     public BalaPistola(float x, float y, float velocidadX, float velocidadY, Texture textura) {
-        super(x, y, velocidadX, velocidadY, textura, 10, 10);
-        this.danio = 10;
+    	super(x, y, velocidadX, velocidadY, textura, 10, 10);
+    	this.danio = ConfiguracionJuego.DANIO_PISTOLA;
     }
     
     //Constructor con danio personalizado
     
     public BalaPistola(float x, float y, float velocidadX, float velocidadY, Texture textura, int danio) {
-        super(x, y, velocidadX, velocidadY, textura, 10, 10);
+    	super(x, y, velocidadX, velocidadY, textura, 10, 10);
         this.danio = danio;
     }
     

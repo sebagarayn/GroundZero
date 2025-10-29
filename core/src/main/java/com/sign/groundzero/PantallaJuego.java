@@ -10,130 +10,192 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
-/**
- * Pantalla principal del juego
- * Maneja la lógica del juego, renderizado y colisiones
- */
+//Pantalla principal del juego
+//Maneja la lógica del juego, renderizado y colisiones.
 
-public class PantallaJuego implements Screen {
-	private static final float worldWidth = 1600f;
-	private static final float worldHeight = 900f;
+public class PantallaJuego implements Screen, LimitesJuego {
+	
+	private Viewport viewport;
+	private Texture backgroundTexture;
+	
+	//Componentes Principales
+	
 	private GroundZero game;
 	private OrthographicCamera camera;	
 	private SpriteBatch batch;
-	private Sound explosionSound;
+	
+	//Audio
+	
+	private Sound ZombieHeridoSonido;
 	private Music gameMusic;
+	
+	// Recursos
+	
+	private Texture texturaJugador;
+	private Sound sonidoHeridoJugador;
+	private Texture texturaBalaPistola;
+	private Sound sonidoDisparo;
+	
+	//Estado del juego
+	
 	private int score;
 	private int ronda;
-	private int velXZombies; 
-	private int velYZombies; 
 	private int cantZombies;
 	private boolean escopetaDesbloqueada = false; //Si tiene o no la escopeta el jugador
+	
+	//Texturas
+	
 	private Texture texturaEscopeta;
+	private Texture texturaZombie;
+	private Texture texturaAcechador;
+	
+	//Entidades del juego
 	
 	private Superviviente jugador;
-	private ArrayList<Enemigo> zombies = new ArrayList<>();
-	private ArrayList<Proyectil> balas = new ArrayList<>();
+	private ArrayList<Enemigo> zombies;
+	private ArrayList<Proyectil> balas;
+	
+	//Constructor PantallaJuego
 
-	public PantallaJuego(GroundZero game, int ronda, int vidas, int score, int velXZombies, int velYZombies, int cantZombies) {
+	public PantallaJuego(GroundZero game, int ronda, int vidas, int score, int cantZombies) {
+		
 		this.game = game;
 		this.ronda = ronda;
 		this.score = score;
-		this.velXZombies = velXZombies;
-		this.velYZombies = velYZombies;
 		this.cantZombies = cantZombies;
+		this.escopetaDesbloqueada = false;
+		
+		//Inicializar listas
+		
+		this.zombies = new ArrayList<Enemigo>();
+		this.balas = new ArrayList<Proyectil>();
+		
+		//Configurar camara
 		
 		batch = game.getBatch();
 		camera = new OrthographicCamera();	
-		camera.setToOrtho(false, worldWidth, worldHeight);
+		camera.setToOrtho(false, ConfiguracionJuego.WORLD_WIDTH, ConfiguracionJuego.WORLD_HEIGHT);
 		
-		//inicializar assets; musica de fondo y efectos de sonido
+		viewport = new FitViewport(ConfiguracionJuego.WORLD_WIDTH, ConfiguracionJuego.WORLD_HEIGHT, camera);
+		backgroundTexture = new Texture(Gdx.files.internal("Fondos/FondoJuego.png"));
 		
-		explosionSound = Gdx.audio.newSound(Gdx.files.internal("explosion.ogg"));
-		explosionSound.setVolume(1, 0.5f);
-		gameMusic = Gdx.audio.newMusic(Gdx.files.internal("piano-loops.wav"));
+		//Inicializar audio
 		
+		inicializarAudio();
+		
+		//Inicializar texturas
+		
+		texturaEscopeta = new Texture(Gdx.files.internal("Rocket2.png"));
+		texturaJugador = new Texture(Gdx.files.internal("Superviviente/Superviviente.png"));
+		sonidoHeridoJugador = Gdx.audio.newSound(Gdx.files.internal("hurt.mp3")); 
+		texturaBalaPistola = new Texture(Gdx.files.internal("Rocket2.png")); 
+		sonidoDisparo = Gdx.audio.newSound(Gdx.files.internal("SonidoBala.mp3"));
+		texturaZombie = new Texture(Gdx.files.internal("Enemigos/zombie.png"));
+		texturaAcechador = new Texture(Gdx.files.internal("Enemigos/acechador.png"));
+		
+		//Crear jugador
+		
+		Arma pistolaInicial = new Pistola(texturaBalaPistola, sonidoDisparo);
+		jugador = new Superviviente(Gdx.graphics.getWidth()/2-50, 30, texturaJugador, sonidoHeridoJugador, pistolaInicial);
+		jugador.setVidas(vidas);
+		
+		//Crear zombies
+		
+		crearZombies();
+	}
+	
+	//Para inicializar los recursos de audio
+	
+	private void inicializarAudio() {
+
+		ZombieHeridoSonido = Gdx.audio.newSound(Gdx.files.internal("ZombieHerido.mp3"));
+		ZombieHeridoSonido.setVolume(1, 0.5f);
+		
+		gameMusic = Gdx.audio.newMusic(Gdx.files.internal("OST.mp3"));		
 		gameMusic.setLooping(true);
 		gameMusic.setVolume(0.5f);
 		gameMusic.play();
-		
-		texturaEscopeta = new Texture(Gdx.files.internal("Rocket2.png"));
-		
-	    // Crear jugador
-	    jugador = new Superviviente(
-	    		Gdx.graphics.getWidth()/2-50, 30,
-	    		new Texture(Gdx.files.internal("Superviviente/Superviviente.png")),
-	    		Gdx.audio.newSound(Gdx.files.internal("hurt.ogg")), 
-	    		new Texture(Gdx.files.internal("Rocket2.png")), 
-	    		Gdx.audio.newSound(Gdx.files.internal("pop-sound.mp3"))
-	    );
-        jugador.setVidas(vidas);
-        
-        // Crear zombies
-        crearZombies();
 	}
+	
+	//Para crear loz zombies en la ronda actual
     
 	private void crearZombies() {
+		
 	    Random r = new Random();
+	    int altoZombie = (int)(ConfiguracionJuego.ANCHO_ZOMBIE * ConfiguracionJuego.ASPECT_RATIO_ZOMBIE);
 	    
-	    // Calcular proporción de la imagen original
-	    float aspectRatio = 291f / 256f;
-	    
-	    int anchoZombie = 80;
-	    int altoZombie = (int)(anchoZombie * aspectRatio);  //
-	    
-	    for (int i = 0; i < cantZombies; i++) {
-	        float posX = r.nextInt((int)Gdx.graphics.getWidth());
-	        float posY = 50 + r.nextInt((int)Gdx.graphics.getHeight()-50);
+	    for (int i = 0 ; i < cantZombies ; i++) {
+	        float posX = r.nextInt((int)Gdx.graphics.getWidth() - ConfiguracionJuego.ANCHO_ZOMBIE); 
+	        float posY = 50 + r.nextInt((int)Gdx.graphics.getHeight() - 50 - altoZombie);
 	        
-	        if (r.nextInt(5) == 0) { // 20% de probabilidad de ser un Acechador
-	            Acechador acechador = new Acechador(
-	                posX, posY, anchoZombie, altoZombie, 
-	                velXZombies + r.nextInt(4), // O una velocidad base
-	                new Texture(Gdx.files.internal("Enemigos/acechador.png"))
-	            );
-	            zombies.add(acechador); // Añadir a la List<Enemigo>
-	        } else { // 80% de ser un Zombie normal
-	            Zombie zombie = new Zombie(
-	                posX, posY, anchoZombie, altoZombie, 
-	                velXZombies + r.nextInt(4), 
-	                velYZombies + r.nextInt(4), 
-	                new Texture(Gdx.files.internal("Enemigos/zombie.png"))
-	            );	   
-	            zombies.add(zombie); // Añadir a la List<Enemigo>
-	        }
+	        Enemigo nuevoEnemigo = crearEnemigoAleatorio(r, posX, posY, ConfiguracionJuego.ANCHO_ZOMBIE, altoZombie);
+	        zombies.add(nuevoEnemigo);
 	    }
 	}
+	
+	//Para crear un enemigo aleatorio (Zombie / Acechador)
+	
+	private Enemigo crearEnemigoAleatorio(Random r, float posX, float posY, int ancho, int alto) {
+	    
+	    if (r.nextInt(ConfiguracionJuego.PROBABILIDAD_ACECHADOR) == 0) {
+	        // Acechador NO necesita al jugador (movimiento errático)
+	        return new Acechador(
+	            posX, posY, 
+	            (float)ancho, (float)alto, 
+	            ConfiguracionJuego.VELOCIDAD_ACECHADOR, 
+	            texturaAcechador,
+	            this
+	        );
+	    } else {
+	        
+	        float velocidadZombie = ConfiguracionJuego.VELOCIDAD_ZOMBIE; 
+	        
+	        return new Zombie(
+	            posX, posY, 
+	            (float)ancho, (float)alto, 
+	            texturaZombie,
+	            this,           
+	            jugador,        
+	            velocidadZombie 
+	        );
+	    }
+	}
+
+	//Para dibujar el encabezado con informacion del juego
 	
 	private void dibujarEncabezado() {
 		CharSequence str = "Vidas: " + jugador.getVidas() + " Ronda: " + ronda;
 		game.getFont().getData().setScale(2f);		
 		game.getFont().draw(batch, str, 10, 30);
-		game.getFont().draw(batch, "Score:" + this.score, Gdx.graphics.getWidth()-150, 30);
-		game.getFont().draw(batch, "HighScore:" + game.getHighScore(), Gdx.graphics.getWidth()/2-100, 30);
+		game.getFont().draw(batch, "Score:" + this.score, ConfiguracionJuego.WORLD_WIDTH - 200, 30);
+		game.getFont().draw(batch, "HighScore:" + game.getHighScore(), ConfiguracionJuego.WORLD_WIDTH / 2 - 100, 30);
 	}
 	
 	@Override
 	public void render(float delta) {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
-		// Actualizar lógica
-		actualizarJuego(delta);
+		actualizarJuego(delta); //Se actualiza la logica
 		
-		// Renderizar
-		batch.begin();
+		viewport.apply();
+		batch.setProjectionMatrix(camera.combined);
+		
+		batch.begin(); //Se renderiza
+		game.getBatch().draw(backgroundTexture, 0, 0, ConfiguracionJuego.WORLD_WIDTH, ConfiguracionJuego.WORLD_HEIGHT);
 		dibujarEncabezado();
 		dibujarEntidades();
 		batch.end();
-		
-		// Verificar condiciones de fin
-		verificarEstadoJuego();
+
+		verificarEstadoJuego(); //Se verifica las condiciones de fin
 	}
+	
+	//Para actualizar toda la logica del juego
 	
 	private void actualizarJuego(float delta) {
 		if (!jugador.estaHerido()) {
-			
 			jugador.actualizar(delta); //Actualizar jugador (esto también actualiza el cooldown del arma)
 			
             if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) { //Logica de disparo
@@ -148,8 +210,10 @@ public class PantallaJuego implements Screen {
 		}
 	}
 	
+	//Para actualizar todas las balas y eliminar las destruidas
+	
 	private void actualizarBalas(float delta) {
-		for (int i = balas.size() - 1; i >= 0; i--) { //Para eliminar balas.
+		for (int i = balas.size() - 1 ; i >= 0 ; i--) { //Para eliminar balas.
 			Proyectil bala = balas.get(i);
 			bala.actualizar(delta);		
 			if (bala.estaDestruido()) {
@@ -158,8 +222,10 @@ public class PantallaJuego implements Screen {
 		}
 	}
 	
+	//Para actualizar todos los zombies y eliminar los destruidos
+	
 	private void actualizarZombies(float delta) {
-		for (int i = zombies.size() - 1; i >= 0; i--) { //Para eliminar zombies.
+		for (int i = zombies.size() - 1 ; i >= 0 ; i--) { //Para eliminar zombies.
 			Enemigo zombie = zombies.get(i);
 			zombie.actualizar(delta);
 			
@@ -169,140 +235,184 @@ public class PantallaJuego implements Screen {
 		}
 	}
 	
+	//Para detectar y procesar todas las colisiones del juego, usa bucles inversos para evitar problemas con indices
+	
 	private void detectarColisiones() {
-		for (int i = 0; i < balas.size(); i++) {
-			// CORRECCIÓN: Usar la abstracción Proyectil
+		detectarColisionesBalasZombies();
+		detectarColisionesJugadorZombies();
+		detectarColisionesEntreZombies();
+	}
+	
+	//Detecta colisiones entre balas y zombies
+	
+	private void detectarColisionesBalasZombies() {
+		for (int i = balas.size() - 1 ; i >= 0 ; i--) {
 			Proyectil bala = balas.get(i);
+			boolean balaDestruida = false;
 			
-			// Bucle 'for j' para enemigos
-			for (int j = 0; j < zombies.size(); j++) {
-				// CORRECCIÓN: Usar la abstracción Enemigo
-				Enemigo zombie = zombies.get(j);
-				
-				// Esta lógica funciona gracias al polimorfismo
-				if (bala.getBounds().overlaps(zombie.getBounds())) {
-					bala.alColisionar(zombie);
-					zombie.alColisionar(bala);
-					explosionSound.play();
-					score += zombie.getValorPuntos();
-					// bala.destruir(); // bala.alColisionar ya debería hacer esto
-
-					if (zombie.estaMuerto() || zombie.estaDestruido()) {
-						zombies.remove(j);
-						j--; // Compensar el índice por la eliminación
-					}
-					
-					// Si la bala choca, también debe destruirse
-					if (bala.estaDestruido()) {
-						balas.remove(i);
-						i--; // Compensar el índice
-						break; // Salir del bucle 'j' (zombies) porque la bala ya no existe
-					}
-				}
-			}
-		}
-		
-		// Colisiones jugador vs zombies
-		for (int i = 0; i < zombies.size(); i++) {
-			Enemigo zombie = zombies.get(i);
-			if (jugador.getBounds().overlaps(zombie.getBounds()) && 
-				jugador.puedeColisionarCon(zombie)) {
-				jugador.alColisionar(zombie);
-				zombie.alColisionar(jugador);
-			}
-		}
-		
-		// Colisiones entre zombies
-		for (int i = 0; i < zombies.size(); i++) {
-			Enemigo zombie1 = zombies.get(i);
-			for (int j = i + 1; j < zombies.size(); j++) {
-				Enemigo zombie2 = zombies.get(j);
-				if (zombie1.getBounds().overlaps(zombie2.getBounds())) {
-					zombie1.alColisionar(zombie2);
-					zombie2.alColisionar(zombie1);
-				}
-			}
+			for (int j = zombies.size() - 1; j >= 0; j--) {
+                Enemigo zombie = zombies.get(j);
+                
+                if (bala.getBounds().overlaps(zombie.getBounds())) {
+                    bala.alColisionar(zombie);
+                    zombie.alColisionar(bala);
+                    ZombieHeridoSonido.play();
+                    score += zombie.getValorPuntos();
+                    
+                    if (zombie.estaMuerto() || zombie.estaDestruido()) {
+                        zombies.remove(j);
+                    }
+                    
+                    if (bala.estaDestruido()) {
+                        balas.remove(i);
+                        balaDestruida = true;
+                        break;
+                    }
+                }
+            }
+            
+            if (balaDestruida) {
+                break;
+            }
 		}
 	}
 	
-	private void dibujarEntidades() {
-		for (Proyectil bala : balas) {
-			bala.dibujar(batch);
-		}
-		
-		// Dibujar jugador
-		jugador.dibujar(batch);
-		
-		// Dibujar zombies
-		for (Enemigo zombie : zombies) {
-			zombie.dibujar(batch);
-		}
-	}
+	//Para detectar colisiones entre jugador y zombies
 	
-	private void verificarEstadoJuego() {
-		final int scoreEscopeta = 100;
-		
-		if (!escopetaDesbloqueada && score >= scoreEscopeta) {
-			escopetaDesbloqueada = true;
-			Escopeta nuevaArma = new Escopeta(texturaEscopeta);
-			jugador.equiparArma(nuevaArma);
-		}
-		// Game Over
-		if (jugador.estaDestruido()) {
-			if (score > game.getHighScore()) {
-				game.setHighScore(score);
-			}
-			Screen ss = new PantallaGameOver(game);
-			ss.resize(1200, 800);
-			game.setScreen(ss);
-			dispose();
-		}
-		
-		// Nivel completado
-		if (zombies.size() == 0) {
-			Screen ss = new PantallaJuego(game, ronda+1, jugador.getVidas(), score, velXZombies+3, velYZombies+3, cantZombies+10);
-			ss.resize(1600, 900);
-			game.setScreen(ss);
-			dispose();
-		}
-	}
-	
-	@Override
-	public void show() {
-		gameMusic.play();
-	}
-
-	@Override
-	public void resize(int width, int height) {
-		// TODO: Implementar si es necesario
-	}
-
-	@Override
-	public void pause() {
-		// TODO: Implementar si es necesario
-	}
-
-	@Override
-	public void resume() {
-		// TODO: Implementar si es necesario
-	}
-
-	@Override
-	public void hide() {
-		// TODO: Implementar si es necesario
-	}
-
-	@Override
-	public void dispose() {
-		explosionSound.dispose();
-		gameMusic.dispose();
-	}
-	
-	public static float getWorldWidth() {
-        return worldWidth;
+    private void detectarColisionesJugadorZombies() {
+        for (int i = 0; i < zombies.size(); i++) {
+            Enemigo zombie = zombies.get(i);
+            if (jugador.getBounds().overlaps(zombie.getBounds()) && 
+                jugador.puedeColisionarCon(zombie)) {
+                jugador.alColisionar(zombie);
+                zombie.alColisionar(jugador);
+            }
+        }
     }
-	
-    public static float getWorldHeight() {
-        return worldHeight;
+    
+    //Para detectar colisiones entre zombies
+    
+    private void detectarColisionesEntreZombies() {
+        for (int i = 0; i < zombies.size(); i++) {
+            Enemigo zombie1 = zombies.get(i);
+            for (int j = i + 1; j < zombies.size(); j++) {
+                Enemigo zombie2 = zombies.get(j);
+                if (zombie1.getBounds().overlaps(zombie2.getBounds())) {
+                    zombie1.alColisionar(zombie2);
+                    zombie2.alColisionar(zombie1);
+                }
+            }
+        }
     }
-}
+    
+    //Para dibujar las entidades del juego
+    
+    private void dibujarEntidades() {
+        for (Proyectil bala : balas) { //Dibujar las balas
+            bala.dibujar(batch);
+        }
+        
+        jugador.dibujar(batch); //Dibujar al jugador
+        
+        for (Enemigo zombie : zombies) { //Dibujas zombies
+            zombie.dibujar(batch);
+        }
+    }
+    
+    //Verifica condiciones de fin, ya sea Game Over o nivel completo
+    
+    private void verificarEstadoJuego() {
+        verificarDesbloqueoEscopeta();
+        verificarGameOver();
+        verificarNivelCompletado();
+    }
+    
+    //Verifica si se debe desbloquear la escopeta
+    
+    private void verificarDesbloqueoEscopeta() {
+        if (!escopetaDesbloqueada && score >= ConfiguracionJuego.SCORE_DESBLOQUEO_ESCOPETA) {
+            escopetaDesbloqueada = true;
+            Escopeta nuevaArma = new Escopeta(texturaEscopeta, sonidoDisparo);
+            jugador.equiparArma(nuevaArma);
+        }
+    }
+    
+    //Verifica condiciones para Game Over
+    
+    private void verificarGameOver() {
+        if (jugador.estaDestruido()) {
+            if (score > game.getHighScore()) {
+                game.setHighScore(score);
+            }
+            Screen ss = new PantallaGameOver(game);
+            ss.resize((int)getWorldWidth(), (int)getWorldHeight());
+            game.setScreen(ss);
+            dispose();
+        }
+    }
+    
+    //Verifica si el nivel fue completado
+    
+    private void verificarNivelCompletado() {
+        if (zombies.size() == 0) {
+            Screen ss = new PantallaJuego(game, ronda + 1, jugador.getVidas(), score, cantZombies + 10);
+            ss.resize((int)getWorldWidth(), (int)getWorldHeight());
+            game.setScreen(ss);
+            dispose();
+        }
+    }
+    
+    
+    //Para la implementacion de LimitesJuego
+    
+    @Override
+    public float getWorldWidth() {
+        return ConfiguracionJuego.WORLD_WIDTH;
+    }
+    
+    @Override
+    public float getWorldHeight() {
+        return ConfiguracionJuego.WORLD_HEIGHT;
+    }
+    
+    @Override
+    public void show() {
+        gameMusic.play();
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        viewport.update(width, height, true);
+    }
+
+    @Override
+    public void pause() {
+        // No se requiere implementación para este juego
+    }
+
+    @Override
+    public void resume() {
+        // No se requiere implementación para este juego
+    }
+
+    @Override
+    public void hide() {
+        // No se requiere implementación para este juego
+    }
+
+    @Override
+    public void dispose() {
+    	if (ZombieHeridoSonido != null) ZombieHeridoSonido.dispose();
+		if (gameMusic != null) gameMusic.dispose();
+		if (texturaEscopeta != null) texturaEscopeta.dispose();
+		if (texturaJugador != null) texturaJugador.dispose();
+		if (sonidoHeridoJugador != null) sonidoHeridoJugador.dispose();
+		if (texturaBalaPistola != null) texturaBalaPistola.dispose();
+		if (sonidoDisparo != null) sonidoDisparo.dispose();
+	    if (texturaZombie != null) texturaZombie.dispose();
+	    if (texturaAcechador != null) texturaAcechador.dispose();
+	    if (backgroundTexture != null) {
+	        backgroundTexture.dispose();
+	    }
+    }
+}		

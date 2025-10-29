@@ -1,6 +1,6 @@
 package com.sign.groundzero;
 
-/*INTERFAZ: Para objetos que pueden recibir daño*/
+/*INTERFAZ: Para objetos que pueden recibir daño.*/
 
 public interface Daniable {
 	void recibirDanio(int danio);
