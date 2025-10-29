@@ -1,5 +1,4 @@
 package com.sign.groundzero;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -96,7 +95,7 @@ public abstract class Proyectil extends ObjetoJuego implements Colisionable, Mov
 	
 	//Metodos Auxiliares
     private boolean fueraDePantalla() {
-        return getX() < 0 || getX() > Gdx.graphics.getWidth() || getY() < 0 || getY() > Gdx.graphics.getHeight();
+    	return getX() < 0 || getX() > ConfiguracionJuego.WORLD_WIDTH || getY() < 0 || getY() > ConfiguracionJuego.WORLD_HEIGHT;
     }
 	
 	protected Sprite getSprite() { //Se necesita que la sublase acceda

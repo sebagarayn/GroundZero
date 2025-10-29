@@ -125,7 +125,7 @@ public abstract class Entidad extends ObjetoJuego implements Colisionable, Movib
 	
 	protected boolean esInvulnerableTemporalmente() {
 		
-	    return false; // Por defecto, siempre puede recibir daño
+		return isHit;
 	}
 	
 	@Override

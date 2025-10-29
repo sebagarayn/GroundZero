@@ -83,6 +83,7 @@ public class Zombie extends Enemigo {
     @Override
     public void alColisionar(Colisionable otro) {
     	
+    	// Implementa regla del juego: "enemigos rebotan solo entre sí, previene rebote no deseado con jugador u otras entidades móviles
         if (otro instanceof Enemigo) {
             manejarReboteConEnemigo((Movible) otro);
         }

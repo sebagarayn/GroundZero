@@ -24,7 +24,7 @@ public abstract class Enemigo extends Entidad {
 	}
 	
 	@Override
-	public boolean puedeColisionarCon(Colisionable otro) {
+	public boolean puedeColisionarCon(Colisionable otro) { // Define las entidades con las que los enemigos pueden interactuar
 		return !estaDestruido();
 	}
 	

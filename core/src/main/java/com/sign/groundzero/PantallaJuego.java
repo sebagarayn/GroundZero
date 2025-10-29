@@ -99,7 +99,7 @@ public class PantallaJuego implements Screen, LimitesJuego {
 		//Crear jugador
 		
 		Arma pistolaInicial = new Pistola(texturaBalaPistola, sonidoDisparo);
-		jugador = new Superviviente(Gdx.graphics.getWidth()/2-50, 30, texturaJugador, sonidoHeridoJugador, pistolaInicial);
+		jugador = new Superviviente(ConfiguracionJuego.WORLD_WIDTH/2-50, 30, texturaJugador, sonidoHeridoJugador, pistolaInicial);
 		jugador.setVidas(vidas);
 		
 		//Crear zombies

@@ -72,7 +72,7 @@ public class Acechador extends Enemigo {
     @Override
     public void alColisionar(Colisionable otro) {
     	
-        if (otro instanceof Movible && otro instanceof Enemigo) { // Rebote con otros enemigos (Movible), que es una regla especifica del juego en si.
+        if (otro instanceof Movible && otro instanceof Enemigo) { // Implementa regla del juego: "enemigos rebotan solo entre sí, previene rebote no deseado con jugador u otras entidades móviles
             manejarReboteConEnemigo((Movible) otro);
         }
     }

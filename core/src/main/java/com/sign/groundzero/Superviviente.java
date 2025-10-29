@@ -110,8 +110,8 @@ public class Superviviente extends Entidad implements Objetivo {
 		float currentAncho = getAncho();
     	float currentAlto = getAlto();
     	
-    	float screenWidth = Gdx.graphics.getWidth();
-    	float screenHeight = Gdx.graphics.getHeight();
+    	float screenWidth = ConfiguracionJuego.WORLD_WIDTH;
+    	float screenHeight = ConfiguracionJuego.WORLD_HEIGHT;
 		
 		if (targetX < 0) {
 	        targetX = 0;
