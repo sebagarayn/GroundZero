@@ -1,9 +1,6 @@
 package com.sign.groundzero;
 
-/*Clase Concreta: Declarada como public final porque ninguna clase hereda 
- *de ella, solo es para contener constantes estaticas..*/
-
-//====================   CLASE CONFIGURACIONJUEGO   ====================
+//Clase Concreta: Declarada como public final porque ninguna clase hereda de ella, solo es para contener constantes estaticas.*/
 
 public final class ConfiguracionJuego {
 	
@@ -52,8 +49,7 @@ public final class ConfiguracionJuego {
     
     
     
-    //Se utiliza un constructor privado de esta manera se evita la instanciacion, porque esta clase es solo para acceder a constantes estaticas. Asi evitamos errores.
-    
+    //Se utiliza un constructor privado de esta manera se evita la instanciacion, porque esta clase es solo para acceder a constantes estaticas. Asi evitamos errores.  
     private ConfiguracionJuego() {
         throw new UnsupportedOperationException(
             "ConfiguracionJuego es una clase de utilidad y no debe ser instanciada"

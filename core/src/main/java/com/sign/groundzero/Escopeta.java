@@ -4,37 +4,32 @@ import com.badlogic.gdx.audio.Sound;
 import java.util.List;
 
 //Clase Concreta: Para el comportamiento de disparo de una escopeta.
-//Extiende Arma..
+//Extiende Arma.
 
 public class Escopeta extends Arma {
 	private Texture texturaProyectil; //Textura para los perdigones, bala de escopeta.
 	private Sound sonidoDisparo;
 	
-	//Constructor, se llama al constructor de arma pasando la cadencia.
-	
+	//Constructor, se llama al constructor de arma pasando la cadencia.	
     public Escopeta(Texture texturaProyectil, Sound sonidoDisparo) {
         super(ConfiguracionJuego.CADENCIA_ESCOPETA);
         this.texturaProyectil = texturaProyectil;
         this.sonidoDisparo = sonidoDisparo;
     }
 	
-	//Para implementar el algoritmo de disparo para la escopeta.
-	
+	//Para implementar el algoritmo de disparo para la escopeta.	
     @Override
     public void disparar(Superviviente portador, List<Proyectil> balasDelMundo) {
         if (!puedeDisparar()) {
             return;
         }
-
-        float x = portador.getX();
-        float y = portador.getY();
+        float x = portador.getX() + portador.getAncho() / 2;
+        float y = portador.getY() + portador.getAlto() / 2;
         Direccion dir = portador.getDireccionActual();
-
         float vx_centro = 0, vy_centro = 0;
         float vx_spread = 0, vy_spread = 0;
         float velocidad = ConfiguracionJuego.VELOCIDAD_BALA_ESCOPETA;
         float spread = ConfiguracionJuego.SPREAD_ESCOPETA;
-
         switch(dir) {
             case ARRIBA:
                 vy_centro = velocidad;

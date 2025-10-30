@@ -5,13 +5,14 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-// Clase concreta
+// Clase concreta GroundZero
 
 public class GroundZero extends Game {
 	private SpriteBatch batch;
 	private BitmapFont font;
 	private int highScore;	
 
+	// Se encarga de inicializar los recursos globales y la pantalla de menu.
 	public void create() {
 		highScore = 0;
 		batch = new SpriteBatch();

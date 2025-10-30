@@ -4,10 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 
-/*CLASE ABSTRACTA: Para todos los proyectiles del juego, extiende ObjetoJuego e implementa
- *Colisionable y Movible.*/
-
-// ========================= CLASE ABSTRACTA PROYECTIL ========================= 
+//Clase Abstracta: Para todos los proyectiles del juego, extiende ObjetoJuego e implementaColisionable y Movible.
 
 public abstract class Proyectil extends ObjetoJuego implements Colisionable, Movible {
 	private Sprite sprite;
@@ -25,8 +22,7 @@ public abstract class Proyectil extends ObjetoJuego implements Colisionable, Mov
 		this.sprite.setBounds(x, y, ancho, alto);
 	}
 	
-	//Implementacion de ObjetoJuego
-	
+	//Implementacion de ObjetoJuego	
 	@Override
 	public void actualizar(float delta) {
 		mover(delta);
