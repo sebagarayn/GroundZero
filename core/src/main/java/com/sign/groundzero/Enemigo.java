@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Rectangle;
 
 public abstract class Enemigo extends Entidad {
 	private final int valorPuntos;
+	protected EstrategiaMovimiento estrategia;
 	
 	// Constructor	
 	public Enemigo(float x, float y, float ancho, float alto, Texture textura, int salud, int valorPuntos) {	
@@ -19,14 +20,23 @@ public abstract class Enemigo extends Entidad {
 		return valorPuntos;
 	}
 	
+	public void setEstrategia(EstrategiaMovimiento estrategia) {
+		this.estrategia = estrategia;
+	}
+	
+	@Override
+	public void actualizar(float delta) {
+		if(estrategia != null) {
+			estrategia.mover(this, delta);
+		}
+		super.actualizar(delta);
+		validarPosicionInicial();
+	}
+	
 	@Override
 	public boolean puedeColisionarCon(Colisionable otro) { // Define las entidades con las que los enemigos pueden interactuar
 		return !estaDestruido();
 	}
-	
-	//Comportamiento especifico de movimiento del enemigo
-	//Las sublclase pueden sobrescribir este metodo
-	public abstract void comportamientoMovimiento(float delta);
 	
 	//Para el rango de ataque de los enemigos	
 	@Override
@@ -43,17 +53,13 @@ public abstract class Enemigo extends Entidad {
         return new Rectangle(hitboxX, hitboxY, hitboxWidth, hitboxHeight);
 	}
 	
-	protected void validarPosicionInicial(LimitesJuego limites) {
+	protected void validarPosicionInicial() {
 	    float newX = getX();
 	    float newY = getY();
-	    float ancho = getAncho();
-	    float alto = getAlto();
-	    float worldWidth = limites.getWorldWidth();
-	    float worldHeight = limites.getWorldHeight();
 	    if (newX < 0) newX = 0;
-	    if (newX + ancho > worldWidth) newX = worldWidth - ancho;
+	    if (newX + getAncho() > ConfiguracionJuego.WORLD_WIDTH) newX = ConfiguracionJuego.WORLD_WIDTH - getAncho();
 	    if (newY < 0) newY = 0;
-	    if (newY + alto > worldHeight) newY = worldHeight - alto;
+	    if (newY + getAlto() > ConfiguracionJuego.WORLD_HEIGHT) newY = ConfiguracionJuego.WORLD_HEIGHT - getAlto();
 	    setPosicion(newX, newY);
 	}
 }
