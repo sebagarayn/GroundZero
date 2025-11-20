@@ -19,33 +19,38 @@ public class Pistola extends Arma {
 	
 	//Para implementar algoritmos de disparo para la pistola.	
 	@Override
-    public void disparar(Superviviente portador, List<Proyectil> balasDelMundo) {
-        if (!puedeDisparar()) {
-            return;
-        }
-        float x = portador.getX() + portador.getAncho() / 2; //Centrada
-        float y = portador.getY() + portador.getAlto() / 2; //Centrada
+	protected void crearProyectiles(Superviviente portador, List<Proyectil> balasDelMundo) {
+        float x = portador.getX() + portador.getAncho() / 2;
+        float y = portador.getY() + portador.getAlto() / 2;
         Direccion dir = portador.getDireccionActual();
+        
         float vx = 0;
         float vy = 0;
         float velocidad = ConfiguracionJuego.VELOCIDAD_BALA_PISTOLA;
-        switch(dir) {
-            case ARRIBA:
-                vy = velocidad;
-                break;
-            case ABAJO:
-                vy = -velocidad;
-                break;
-            case DERECHA:
-                vx = velocidad;
-                break;
-            case IZQUIERDA:
-                vx = -velocidad;
-                break;
+        
+        switch(dir){
+        	case ARRIBA:
+        		vy = velocidad;
+        		break;
+        	case ABAJO:
+        		vy = - velocidad;
+        		break;
+        	case DERECHA:
+        		vx = velocidad;
+        		break;
+        	case IZQUIERDA:
+        		vx = - velocidad;
+        		break;
         }
+        
         BalaPistola bala = new BalaPistola(x, y, vx, vy, texturaProyectil);
         balasDelMundo.add(bala);
-        sonidoDisparo.play(0.2f);
-        reiniciarCooldown();
     }
+	
+	@Override
+	protected void reproducirSonido() {
+		if(sonidoDisparo != null) {
+			sonidoDisparo.play(0.2f);
+		}
+	}
 }

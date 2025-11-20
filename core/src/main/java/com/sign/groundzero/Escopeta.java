@@ -19,45 +19,48 @@ public class Escopeta extends Arma {
 	
 	//Para implementar el algoritmo de disparo para la escopeta.	
     @Override
-    public void disparar(Superviviente portador, List<Proyectil> balasDelMundo) {
-        if (!puedeDisparar()) {
-            return;
-        }
+    protected void crearProyectiles(Superviviente portador, List<Proyectil> balasDelMundo) {
         float x = portador.getX() + portador.getAncho() / 2;
         float y = portador.getY() + portador.getAlto() / 2;
         Direccion dir = portador.getDireccionActual();
-        float vx_centro = 0, vy_centro = 0;
-        float vx_spread = 0, vy_spread = 0;
+        
+        float vxCentro = 0, vyCentro = 0;
+        float vxSpread = 0, vySpread = 0;
         float velocidad = ConfiguracionJuego.VELOCIDAD_BALA_ESCOPETA;
         float spread = ConfiguracionJuego.SPREAD_ESCOPETA;
-        switch(dir) {
-            case ARRIBA:
-                vy_centro = velocidad;
-                vx_spread = spread;
-                break;
-            case ABAJO:
-                vy_centro = -velocidad;
-                vx_spread = spread;
-                break;
-            case DERECHA:
-                vx_centro = velocidad;
-                vy_spread = spread;
-                break;
-            case IZQUIERDA:
-                vx_centro = -velocidad;
-                vy_spread = spread;
-                break;
-        }
         
-        BalaEscopeta balaCentro = new BalaEscopeta(x, y, vx_centro, vy_centro, texturaProyectil);
-        BalaEscopeta balaIzquierda = new BalaEscopeta(x, y, vx_centro - vx_spread, vy_centro - vy_spread, texturaProyectil);
-        BalaEscopeta balaDerecha = new BalaEscopeta(x, y, vx_centro + vx_spread, vy_centro + vy_spread, texturaProyectil);
-
+        switch(dir){
+	    	case ARRIBA:
+	    		vyCentro = velocidad;
+	    		vxSpread = spread;
+	    		break;
+	    	case ABAJO:
+	    		vyCentro = - velocidad;
+	    		vxSpread = spread;
+	    		break;
+	    	case DERECHA:
+	    		vxCentro = velocidad;
+	    		vySpread = spread;
+	    		break;
+	    	case IZQUIERDA:
+	    		vxCentro = - velocidad;
+	    		vySpread = spread;
+	    		break;
+	    }
+        
+        BalaEscopeta balaCentro = new BalaEscopeta(x, y, vxCentro, vyCentro, texturaProyectil);
+        BalaEscopeta balaIzquierda = new BalaEscopeta(x, y, vxCentro - vxSpread, vyCentro - vySpread, texturaProyectil);
+        BalaEscopeta balaDerecha = new BalaEscopeta(x, y, vxCentro + vxSpread, vyCentro + vySpread, texturaProyectil);
+        
         balasDelMundo.add(balaCentro);
         balasDelMundo.add(balaIzquierda);
         balasDelMundo.add(balaDerecha);
-        
-        sonidoDisparo.play(0.2f);
-        reiniciarCooldown();
+    }
+    
+    @Override
+    protected void reproducirSonido() {
+    	if(sonidoDisparo != null) {
+    		sonidoDisparo.play(0.2f);
+    	}
     }
 }

@@ -13,8 +13,18 @@ public abstract class Arma {
 		this.tiempoDesdeUltimoDisparo = 1 / cadencia;
 	}
 	
-	//Ejecuta el algoritmo de disparo especifico de la arma.	
-	public abstract void disparar(Superviviente portador, List<Proyectil> balasDelMundo);
+	//Plantilla del Template Method
+	public final void disparar(Superviviente portador, List<Proyectil> balasDelMundo) {
+		if(puedeDisparar()) {
+			crearProyectiles(portador, balasDelMundo);
+			reproducirSonido();
+			reiniciarCooldown();
+		}
+	}
+	
+	//Pasos que deben implementar las subclases
+	protected abstract void crearProyectiles(Superviviente portador, List<Proyectil> balasDelMundo);
+	protected abstract void reproducirSonido();
 	
 	//Actualiza el temporizador interno del cooldown, se llama en cada frame desde el superviviente.	
 	public void actualizar(float delta) {
