@@ -1,7 +1,7 @@
 package com.sign.groundzero;
 
-public class ScoreManager {
-	private static ScoreManager instance; //Instancia de la clase
+public final class ScoreManager {
+	private static final ScoreManager instance = new ScoreManager(); //Instancia de la clase
 	private int score;
 	private int highScore;
 	
@@ -13,9 +13,6 @@ public class ScoreManager {
 	
 	//Para el acceso global
 	public static ScoreManager getInstance() {
-		if(instance == null) {
-			instance = new ScoreManager();
-		}
 		return instance;
 	}
 	
