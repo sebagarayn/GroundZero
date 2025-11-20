@@ -46,8 +46,9 @@ public class PantallaMenu implements Screen {
 	
 	//Para iniciar una nueva partida con valores iniciales.
 	private void iniciarJuego() {
-        Screen ss = new PantallaJuego(game,ConfiguracionJuego.RONDA_INICIAL, ConfiguracionJuego.VIDAS_INICIALES, ConfiguracionJuego.SCORE_INICIAL, ConfiguracionJuego.CANTIDAD_ZOMBIES_INICIAL);
-        ss.resize((int)ConfiguracionJuego.WORLD_WIDTH, (int)ConfiguracionJuego.WORLD_HEIGHT);
+		ScoreManager.getInstance().resetScore();
+		Screen ss = new PantallaJuego(game, ConfiguracionJuego.RONDA_INICIAL, ConfiguracionJuego.VIDAS_INICIALES, ConfiguracionJuego.CANTIDAD_ZOMBIES_INICIAL);
+		ss.resize((int)ConfiguracionJuego.WORLD_WIDTH, (int)ConfiguracionJuego.WORLD_HEIGHT);
         game.setScreen(ss);
         dispose();
 	}

@@ -35,6 +35,10 @@ public class PantallaGameOver implements Screen {
 		
 		game.getBatch().begin();
 		game.getBatch().draw(backgroundTexture, 0, 0, ConfiguracionJuego.WORLD_WIDTH, ConfiguracionJuego.WORLD_HEIGHT);
+		
+		game.getFont().draw(game.getBatch(), "Score Obtenido: " + ScoreManager.getInstance().getScore(), 700, 550);
+		game.getFont().draw(game.getBatch(), "HighScore: " + ScoreManager.getInstance().getHighScore(), 725, 500);
+		
 		game.getFont().draw(game.getBatch(), "Pincha en cualquier lado para reiniciar ...", 550, 250);
 	
 		game.getBatch().end();
@@ -45,7 +49,8 @@ public class PantallaGameOver implements Screen {
 	}
 	
 	private void reiniciarJuego() {
-        Screen ss = new PantallaJuego(game, ConfiguracionJuego.RONDA_INICIAL, ConfiguracionJuego.VIDAS_INICIALES, ConfiguracionJuego.SCORE_INICIAL, ConfiguracionJuego.CANTIDAD_ZOMBIES_INICIAL);
+		ScoreManager.getInstance().resetScore();
+		Screen ss = new PantallaJuego(game, ConfiguracionJuego.RONDA_INICIAL, ConfiguracionJuego.VIDAS_INICIALES, ConfiguracionJuego.CANTIDAD_ZOMBIES_INICIAL);
         ss.resize((int)ConfiguracionJuego.WORLD_WIDTH, (int)ConfiguracionJuego.WORLD_HEIGHT);
         game.setScreen(ss);
         dispose();

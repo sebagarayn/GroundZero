@@ -10,11 +10,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 public class GroundZero extends Game {
 	private SpriteBatch batch;
 	private BitmapFont font;
-	private int highScore;	
 
 	// Se encarga de inicializar los recursos globales y la pantalla de menu.
 	public void create() {
-		highScore = 0;
 		batch = new SpriteBatch();
 		font = new BitmapFont(); // usa Arial font x defecto
 		font.getData().setScale(2f);
@@ -37,15 +35,5 @@ public class GroundZero extends Game {
 
 	public BitmapFont getFont() {
 		return font;
-	}
-
-	public int getHighScore() {
-		return highScore;
-	}
-
-	public void setHighScore(int highScore) {
-	    if (highScore >= 0) {
-	        this.highScore = highScore;
-	    }
 	}
 }

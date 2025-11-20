@@ -32,7 +32,6 @@ public class PantallaJuego implements Screen, LimitesJuego {
 	private Texture texturaBalaPistola;
 	private Sound sonidoDisparo;	
 	//Estado del juego	
-	private int score;
 	private int ronda;
 	private int cantZombies;
 	private boolean escopetaDesbloqueada = false; //Si tiene o no la escopeta el jugador	
@@ -46,10 +45,9 @@ public class PantallaJuego implements Screen, LimitesJuego {
 	private ArrayList<Proyectil> balas;
 	
 	//Constructor
-	public PantallaJuego(GroundZero game, int ronda, int vidas, int score, int cantZombies) {	
+	public PantallaJuego(GroundZero game, int ronda, int vidas, int cantZombies) {	
 		this.game = game;
 		this.ronda = ronda;
-		this.score = score;
 		this.cantZombies = cantZombies;
 		this.escopetaDesbloqueada = false;
 		
@@ -122,8 +120,8 @@ public class PantallaJuego implements Screen, LimitesJuego {
 		CharSequence str = "Vidas: " + jugador.getVidas() + " Ronda: " + ronda;
 		game.getFont().getData().setScale(2f);		
 		game.getFont().draw(batch, str, 10, 30);
-		game.getFont().draw(batch, "Score:" + this.score, ConfiguracionJuego.WORLD_WIDTH - 200, 30);
-		game.getFont().draw(batch, "HighScore:" + game.getHighScore(), ConfiguracionJuego.WORLD_WIDTH / 2 - 100, 30);
+		game.getFont().draw(batch, "Score:" + ScoreManager.getInstance().getScore(), ConfiguracionJuego.WORLD_WIDTH - 200, 30);
+		game.getFont().draw(batch, "HighScore:" + ScoreManager.getInstance().getHighScore(), ConfiguracionJuego.WORLD_WIDTH / 2 - 100, 30);
 	}
 	
 	@Override
@@ -193,7 +191,7 @@ public class PantallaJuego implements Screen, LimitesJuego {
                     bala.alColisionar(zombie);
                     zombie.alColisionar(bala);
                     ZombieHeridoSonido.play();
-                    score += zombie.getValorPuntos();                   
+                    ScoreManager.getInstance().agregarPuntos(zombie.getValorPuntos());              
                     if (zombie.estaMuerto() || zombie.estaDestruido()) {
                         zombies.remove(j);
                     }                  
@@ -256,7 +254,7 @@ public class PantallaJuego implements Screen, LimitesJuego {
     
     //Verifica si se debe desbloquear la escopeta   
     private void verificarDesbloqueoEscopeta() {
-        if (!escopetaDesbloqueada && score >= ConfiguracionJuego.SCORE_DESBLOQUEO_ESCOPETA) {
+    	if (!escopetaDesbloqueada && ScoreManager.getInstance().getScore() >= ConfiguracionJuego.SCORE_DESBLOQUEO_ESCOPETA) {
             escopetaDesbloqueada = true;
             Escopeta nuevaArma = new Escopeta(texturaEscopeta, sonidoDisparo);
             jugador.equiparArma(nuevaArma);
@@ -266,9 +264,6 @@ public class PantallaJuego implements Screen, LimitesJuego {
     //Verifica condiciones para Game Over  
     private void verificarGameOver() {
         if (jugador.estaDestruido()) {
-            if (score > game.getHighScore()) {
-                game.setHighScore(score);
-            }
             Screen ss = new PantallaGameOver(game);
             ss.resize((int)getWorldWidth(), (int)getWorldHeight());
             game.setScreen(ss);
@@ -279,7 +274,7 @@ public class PantallaJuego implements Screen, LimitesJuego {
     //Verifica si el nivel fue completado   
     private void verificarNivelCompletado() {
         if (zombies.size() == 0) {
-            Screen ss = new PantallaJuego(game, ronda + 1, jugador.getVidas(), score, cantZombies + 10);
+        	Screen ss = new PantallaJuego(game, ronda + 1, jugador.getVidas(), cantZombies + 10);
             ss.resize((int)getWorldWidth(), (int)getWorldHeight());
             game.setScreen(ss);
             dispose();
