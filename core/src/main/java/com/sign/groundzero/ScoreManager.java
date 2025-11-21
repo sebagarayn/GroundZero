@@ -1,5 +1,8 @@
 package com.sign.groundzero;
 
+//Implementa el Patrón Singleton para centralizar la gestión del score.
+
+//Clase declarada como 'final' para prevenir la herencia y garantizar la unicidad.
 public final class ScoreManager {
 	private static final ScoreManager instance = new ScoreManager(); //Instancia de la clase
 	private int score;

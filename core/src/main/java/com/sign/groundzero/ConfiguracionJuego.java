@@ -14,12 +14,12 @@ public final class ConfiguracionJuego {
     public static final int RONDA_INICIAL = 1;
     public static final int VIDAS_INICIALES = 3;
     public static final int SCORE_INICIAL = 0;
-    public static final int CANTIDAD_ZOMBIES_INICIAL = 10;
+    public static final int CANTIDAD_ENEMIGOS_INICIAL = 10;
     
     // ====================   ENEMIGOS   ====================
     
-    public static final int ANCHO_ZOMBIE = 120;
-    public static final float ASPECT_RATIO_ZOMBIE = 291f / 256f;
+    public static final int ANCHO_ENEMIGO = 120;
+    public static final float ASPECT_RATIO_ENEMIGO = 291f / 256f;
     public static final float ESCALA_HITBOX_ENEMIGO = 0.4f;
     public static final float VELOCIDAD_ZOMBIE = 40f;    
     public static final float VELOCIDAD_ACECHADOR = 120f;  

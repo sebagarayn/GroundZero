@@ -1,8 +1,7 @@
 package com.sign.groundzero;
 import com.badlogic.gdx.graphics.Texture;
 
-//Clase Concreta Acechador: Representa un enemigo de tipo acechador.
-//Extiende Enemigo.
+//Clase Concreta Acechador: Extiende Enemigo y utiliza la estrategia MovimientoRebote
 
 public class Acechador extends Enemigo {
 
@@ -19,7 +18,7 @@ public class Acechador extends Enemigo {
         validarPosicionInicial();
 	}
     
-    //Para manejar las colisiones con otros objetos usando polimorfismo, respeta LSP al usar interfaces y no clases concretas.  
+    //Maneja colisiones con otros objetos (respeta LSP)
     @Override
     public void alColisionar(Colisionable otro) {  	
         if (otro instanceof Movible && otro instanceof Enemigo) { // Implementa regla del juego: "enemigos rebotan solo entre sí, previene rebote no deseado con jugador u otras entidades móviles
@@ -27,13 +26,13 @@ public class Acechador extends Enemigo {
         }
     }
     
-    //Para determinar si puede colisionar con otro objeto, respetando LSP al verificar capacidades, no tipos especificos.   
+    //Determina si puede colisionar con otro objeto (respeta LSP) 
     @Override
     public boolean puedeColisionarCon(Colisionable otro) {   	
         return !estaDestruido() && (otro instanceof Enemigo || otro instanceof Daniable); // Puede colisionar con otros enemigos o con entidades dañables, que es una regla del juego.
     }
     
-    //Para manejar el rebote con otro enemigo usando interfaces.
+    //Maneja el rebote con otro enemigo.
     private void manejarReboteConEnemigo(Movible otroMovible) {   	
         float vx = getVelocidadX();
         float vy = getVelocidadY();        

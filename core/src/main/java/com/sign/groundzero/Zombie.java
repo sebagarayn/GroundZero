@@ -1,8 +1,7 @@
 package com.sign.groundzero;
 import com.badlogic.gdx.graphics.Texture;
 
- //Clase que representa un enemigo zombie
-//Extiende Enemigo e implementa comportamiento de rebote.
+//Clase que representa un enemigo zombie. Extiende Enemigo y utiliza la estrategia MovimientoPersecucion
 
 public class Zombie extends Enemigo {    
 	// Constructor 
@@ -18,7 +17,7 @@ public class Zombie extends Enemigo {
     // Maneja colision con otros objetos  
     @Override
     public void alColisionar(Colisionable otro) {   	
-    	// Implementa regla del juego: "enemigos rebotan solo entre sí, previene rebote no deseado con jugador u otras entidades móviles
+    	//Regla de colisión: Los enemigos rebotan solo entre sí
         if (otro instanceof Enemigo) {
             manejarReboteConEnemigo((Movible) otro);
         }
@@ -31,7 +30,7 @@ public class Zombie extends Enemigo {
         setVelocidad(-vx, -vy);
     }
     
-    // Determina si puede colisionar con otro objeto   
+    // Determina si puede colisionar con otro objeto (respeta LSP al verificar capacidades)  
     @Override
     public boolean puedeColisionarCon(Colisionable otro) {   	
     	return !estaDestruido() && (otro instanceof Enemigo || otro instanceof Daniable);

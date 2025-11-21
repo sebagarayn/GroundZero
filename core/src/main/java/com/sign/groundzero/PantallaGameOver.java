@@ -8,6 +8,8 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.graphics.Texture;
 
+//Clase PantallaGameOver: Muestra los resultados finales del juego. Actúa como Cliente del Patrón Singleton (ScoreManager)
+
 public class PantallaGameOver implements Screen {
 
 	private GroundZero game;
@@ -48,9 +50,10 @@ public class PantallaGameOver implements Screen {
 		}
 	}
 	
+	//Para reiniciar el juego
 	private void reiniciarJuego() {
 		ScoreManager.getInstance().resetScore();
-		Screen ss = new PantallaJuego(game, ConfiguracionJuego.RONDA_INICIAL, ConfiguracionJuego.VIDAS_INICIALES, ConfiguracionJuego.CANTIDAD_ZOMBIES_INICIAL);
+		Screen ss = new PantallaJuego(game, ConfiguracionJuego.RONDA_INICIAL, ConfiguracionJuego.VIDAS_INICIALES, ConfiguracionJuego.CANTIDAD_ENEMIGOS_INICIAL);
         ss.resize((int)ConfiguracionJuego.WORLD_WIDTH, (int)ConfiguracionJuego.WORLD_HEIGHT);
         game.setScreen(ss);
         dispose();

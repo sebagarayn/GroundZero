@@ -1,5 +1,6 @@
 package com.sign.groundzero;
 
+//Implementa la Estrategia de Movimiento de Rebote.
 public class MovimientoRebote implements EstrategiaMovimiento {
 	private LimitesJuego limites;
 	private float velocidadBase;
@@ -15,6 +16,7 @@ public class MovimientoRebote implements EstrategiaMovimiento {
 		this.velocidadBase = velocidadBase;
 	}
 	
+	// Implementación de la interfaz Strategy, define cómo mover al enemigo
 	@Override
 	public void mover(Enemigo enemigo, float delta) {
 		float vx = enemigo.getVelocidadX();

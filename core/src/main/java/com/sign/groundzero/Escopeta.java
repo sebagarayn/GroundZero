@@ -23,7 +23,7 @@ public class Escopeta extends Arma {
         this.sonidoDisparo = sonidoDisparo;
     }
 	
-	//Para implementar el algoritmo de disparo para la escopeta.	
+    //Patron Template Method: Implementación del paso creación de proyectiles
     @Override
     protected void crearProyectiles(Superviviente portador, List<Proyectil> balasDelMundo) {
         float x = portador.getX() + portador.getAncho() / 2;
@@ -63,6 +63,7 @@ public class Escopeta extends Arma {
         balasDelMundo.add(balaDerecha);
     }
     
+    // Patron Template Method: Implementación del pasoreproducción de sonido
     @Override
     protected void reproducirSonido() {
     	if(sonidoDisparo != null) {

@@ -1,7 +1,7 @@
 package com.sign.groundzero;
 import java.util.List;
 
-//Clase Abstracta: Permite definir el comportamiento de disparo de las armas, pudiendo cambiar el comportamiento de disparo en tiempo de ejecucion..
+//Clase Abstracta: Implementa el Patrón Template Method para definir el algoritmo de disparo de las armas
 
 public abstract class Arma {
 	private final float cadencia; //Cadencia de disparos por segundo

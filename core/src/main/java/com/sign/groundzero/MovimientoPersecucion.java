@@ -1,5 +1,7 @@
 package com.sign.groundzero;
 
+//Implementación concreta de la estrategia de movimiento de persecución
+
 public class MovimientoPersecucion implements EstrategiaMovimiento {
 	private Objetivo objetivo;
 	private float velocidadPersecucion;
@@ -15,6 +17,7 @@ public class MovimientoPersecucion implements EstrategiaMovimiento {
 		this.velocidadPersecucion = velocidadPersecucion;
 	}
 	
+	// Implementación de la interfaz Strategy, define cómo mover al enemigo
 	@Override
 	public void mover(Enemigo enemigo, float delta) {
 		if(objetivo == null || objetivo.estaDestruido()) {

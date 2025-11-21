@@ -9,6 +9,8 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.graphics.Texture;
 
+//Clase PantallaMenu: Pantalla de inicio del juego. Actúa como Cliente del Patrón Singleton (ScoreManager) al inicio de una nueva partida.
+
 public class PantallaMenu implements Screen {
 
 	private GroundZero game;
@@ -47,7 +49,7 @@ public class PantallaMenu implements Screen {
 	//Para iniciar una nueva partida con valores iniciales.
 	private void iniciarJuego() {
 		ScoreManager.getInstance().resetScore();
-		Screen ss = new PantallaJuego(game, ConfiguracionJuego.RONDA_INICIAL, ConfiguracionJuego.VIDAS_INICIALES, ConfiguracionJuego.CANTIDAD_ZOMBIES_INICIAL);
+		Screen ss = new PantallaJuego(game, ConfiguracionJuego.RONDA_INICIAL, ConfiguracionJuego.VIDAS_INICIALES, ConfiguracionJuego.CANTIDAD_ENEMIGOS_INICIAL);
 		ss.resize((int)ConfiguracionJuego.WORLD_WIDTH, (int)ConfiguracionJuego.WORLD_HEIGHT);
         game.setScreen(ss);
         dispose();

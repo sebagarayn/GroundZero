@@ -2,8 +2,7 @@ package com.sign.groundzero;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 
-//Clase Abstracta Enemigo: Para todos los enemigos del juego, extiene Entidad.
-//Agrega comportamiento especifo de enemigos.
+//Clase Abstracta Enemigo: Para todos los enemigos del juego. Implementa el Patrón Strategy para el movimiento
 
 public abstract class Enemigo extends Entidad {
 	private final int valorPuntos;
@@ -15,11 +14,12 @@ public abstract class Enemigo extends Entidad {
 		this.valorPuntos = valorPuntos;
 	}
 	
-	//Para obtener puntos que el enemigo da al destruirlo
+	//Retorna los puntos que el enemigo otorga al ser destruido
 	public int getValorPuntos() {
 		return valorPuntos;
 	}
 	
+	//Permite inyectar o cambiar la estrategia de movimiento del enemigo
 	public void setEstrategia(EstrategiaMovimiento estrategia) {
 		this.estrategia = estrategia;
 	}
