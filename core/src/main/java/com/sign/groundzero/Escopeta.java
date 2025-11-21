@@ -13,6 +13,12 @@ public class Escopeta extends Arma {
 	//Constructor, se llama al constructor de arma pasando la cadencia.	
     public Escopeta(Texture texturaProyectil, Sound sonidoDisparo) {
         super(ConfiguracionJuego.CADENCIA_ESCOPETA);
+		if (texturaProyectil == null) {
+			throw new IllegalArgumentException("La textura del proyectil no puede ser null");
+		}
+		if (sonidoDisparo == null) {
+			throw new IllegalArgumentException("El sonido de disparo no puede ser null");
+		}
         this.texturaProyectil = texturaProyectil;
         this.sonidoDisparo = sonidoDisparo;
     }

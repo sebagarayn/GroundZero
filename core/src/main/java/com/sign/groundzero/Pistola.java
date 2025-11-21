@@ -13,6 +13,12 @@ public class Pistola extends Arma {
 	//Constructor, se llama al constructor de Arma, pasando la cadencia.	
 	public Pistola(Texture texturaProyectil, Sound sonidoDisparo) {
 		super(ConfiguracionJuego.CADENCIA_PISTOLA);
+		if (texturaProyectil == null) {
+			throw new IllegalArgumentException("La textura del proyectil no puede ser null");
+		}
+		if (sonidoDisparo == null) {
+			throw new IllegalArgumentException("El sonido de disparo no puede ser null");
+		}
 		this.texturaProyectil = texturaProyectil;
 		this.sonidoDisparo = sonidoDisparo;
 	}

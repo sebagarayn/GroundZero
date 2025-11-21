@@ -5,6 +5,12 @@ public class MovimientoPersecucion implements EstrategiaMovimiento {
 	private float velocidadPersecucion;
 
 	public MovimientoPersecucion(Objetivo objetivo, float velocidadPersecucion) {
+		if(objetivo == null) {
+			throw new IllegalArgumentException("El objetivo para la persecución no puede ser null");
+		}
+		if(velocidadPersecucion <= 0) {
+			throw new IllegalArgumentException("La velocidad de persecución debe ser positiva");	
+		}
 		this.objetivo = objetivo;
 		this.velocidadPersecucion = velocidadPersecucion;
 	}

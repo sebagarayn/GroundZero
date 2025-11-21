@@ -5,6 +5,12 @@ public class MovimientoRebote implements EstrategiaMovimiento {
 	private float velocidadBase;
 	
 	public MovimientoRebote(LimitesJuego limites, float velocidadBase) {
+		if (limites == null) {
+    		throw new IllegalArgumentException("Los limites de juego no pueden ser null");
+    	}
+		if (velocidadBase <= 0) {
+			throw new IllegalArgumentException("La velocidad de rebote debe ser positiva");
+		}
 		this.limites = limites;
 		this.velocidadBase = velocidadBase;
 	}
@@ -33,6 +39,6 @@ public class MovimientoRebote implements EstrategiaMovimiento {
 		if((currentY <= 0 && vy < 0) || (currentY + alto >= screenHeight && vy > 0)) {
 			vy *= -1;
 		}
-		enemigo.setVelocidad(vx,  vy);;
+		enemigo.setVelocidad(vx,  vy);
 	}
 }
