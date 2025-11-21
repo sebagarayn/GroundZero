@@ -91,7 +91,6 @@ public class PantallaGameOver implements Screen {
 
 	@Override
 	public void dispose() {
-	    // --- AÑADE ESTA LÍNEA ---
 	    if (backgroundTexture != null) {
 	        backgroundTexture.dispose();
 	    }
